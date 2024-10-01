@@ -17,9 +17,6 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? path.join(process.en
 
 process.env.STORAGE_PATH = path.join(app.getPath('userData'), 'storage')
 
-interface WindowsManager {
-  [key: string]: BrowserWindow;
-}
 const windows: WindowsManager = {}
 
 const createWindow = async (name: string, url: string | null = null) => {
