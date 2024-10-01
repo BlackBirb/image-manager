@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getPersistentStore } from './app/persistentStore'
+import { initialSetup } from './app/initialSetup'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -79,7 +80,7 @@ const createWindow = async (name: string, url: string | null = null) => {
     win.show()
   })
 
-  ipcMain.on('minimizeWindow', (evn) => {
+  ipcMain.on('minimizeWindow', () => {
     win.minimize()
   })
 
@@ -103,10 +104,13 @@ app.on('window-all-closed', () => {
   }
 })
 
-Promise.all([
-  app.whenReady(),
-  getPersistentStore()
-])
+initialSetup()
+  .then(() => 
+    Promise.all([
+      app.whenReady(),
+      getPersistentStore()
+    ])
+  )
   .then(() => {
     createWindow('main')
 
