@@ -8,6 +8,10 @@ declare namespace NodeJS {
     REACT_ROOT: string
     /** ~/dist */
     RENDERED_DIST: string
+    /** ~/public | RENDERED_DIST */
+    VITE_PUBLIC: string,
+    /** %appdata%/~/storage */
+    STORAGE_PATH: string
   }
 }
 
