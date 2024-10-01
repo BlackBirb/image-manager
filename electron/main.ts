@@ -75,6 +75,16 @@ const createWindow = async (name: string, url: string | null = null) => {
     win.show()
   })
 
+  if(import.meta.env.DEV) {
+    win.webContents.openDevTools()
+  } else {
+    // Prevent opening new windows by rendered in PROD
+    win.webContents.setWindowOpenHandler(() => ({
+      action: 'deny'
+    }))
+  }
+
+
   windows[name] = win
 }
 
