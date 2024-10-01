@@ -3,7 +3,9 @@ declare namespace NodeJS {
     /** ~/ */
     APP_ROOT: string,
     /** ~/electron */
-    ELECTRON_ROOT: string,
+    ELECTRON_DIST: string,
+    /** ~/dist-electron */
+    MAIN_DIST: string,
     /** ~/src */
     REACT_ROOT: string
     /** ~/dist */

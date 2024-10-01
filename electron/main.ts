@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getPersistentStore } from './app/persistentStore'
@@ -8,6 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 process.env.APP_ROOT = path.join(__dirname, '..')
 
 process.env.ELECTRON_ROOT = path.join(process.env.APP_ROOT, 'electron')
+process.env.ELECTRON_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 process.env.REACT_ROOT = path.join(process.env.APP_ROOT, 'src')
 process.env.RENDERED_DIST = path.join(process.env.APP_ROOT, 'dist')
 
@@ -38,7 +39,7 @@ const createWindow = async (name: string, url: string | null = null) => {
 
   const win = new BrowserWindow({
     webPreferences: {
-      preload: path.join(process.env.ELECTRON_ROOT, 'preload.mjs')
+      preload: path.join(process.env.ELECTRON_DIST, 'preload.mjs')
     },
     title: name,
     x: persistentStore[name].x,
@@ -61,18 +62,25 @@ const createWindow = async (name: string, url: string | null = null) => {
   }
 
   win.on('resize', () => {
+    persistentStore[name].isMaximized = win.isMaximized()
+
+    if(persistentStore[name].isMaximized) return
+
     const bounds = win.getBounds()
     persistentStore[name] = {
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,
-      height: bounds.height,
-      isMaximized: win.isMaximized()
+      height: bounds.height
     }
   })
 
   win.once('ready-to-show', () => {
     win.show()
+  })
+
+  ipcMain.on('minimizeWindow', (evn) => {
+    win.minimize()
   })
 
   if(import.meta.env.DEV) {
