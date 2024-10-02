@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getPersistentStore } from './app/persistentStore'
 import { initialSetup } from './app/initialSetup'
+import { createIPCApi } from './app/ipcMain'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -77,10 +78,6 @@ const createWindow = async (name: string, url: string | null = null) => {
     win.show()
   })
 
-  ipcMain.on('minimizeWindow', () => {
-    win.minimize()
-  })
-
   if(import.meta.env.DEV) {
     win.webContents.openDevTools()
   } else {
@@ -89,7 +86,6 @@ const createWindow = async (name: string, url: string | null = null) => {
       action: 'deny'
     }))
   }
-
 
   windows[name] = win
 }
@@ -102,7 +98,7 @@ app.on('window-all-closed', () => {
 })
 
 initialSetup()
-  .then(() => 
+  .then(() =>
     Promise.all([
       app.whenReady(),
       getPersistentStore()
@@ -110,7 +106,7 @@ initialSetup()
   )
   .then(() => {
     createWindow('main')
-
+    createIPCApi(windows)
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow('main')

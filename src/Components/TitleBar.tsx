@@ -1,10 +1,17 @@
+import { useElectronApi } from "../composables/useElectronApi"
 
 export default function TitleBar() {
+  const electronApi = useElectronApi()
+
   const minimize = () => {
-    window.api.minimize()
+    electronApi.minimize()
   }
-  const maximize = () => {}
-  const close = () => {}
+  const maximize = () => {
+    electronApi.maximize()
+  }
+  const close = () => {
+    electronApi.close()
+  }
 
   return (<>
     <div className="titlebar">
