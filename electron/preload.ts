@@ -1,7 +1,11 @@
-import { contextBridge } from "electron";
+import { contextBridge } from "electron"
 
-import * as ipcRendererApi from './preload/ipcRenderer'
+import * as ipcRendererApi from "./preload/ipcRenderer"
 
-contextBridge.exposeInMainWorld('api', {
-  ...ipcRendererApi
-})
+const api = {
+  ...ipcRendererApi,
+}
+
+contextBridge.exposeInMainWorld("api", api)
+
+export type ElectronAPI = typeof api
