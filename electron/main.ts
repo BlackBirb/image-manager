@@ -88,7 +88,9 @@ const createWindow = async (name: string, url: string | null = null) => {
   }
 
   windows[name] = win
-  windows[win.id].name = name
+  windows[win.id] = {
+    name,
+  }
 }
 
 app.on('window-all-closed', () => {
