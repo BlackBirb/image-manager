@@ -1,12 +1,11 @@
 import { IconButton, Stack } from '@mui/material'
 import {
   Minimize as MinimizeIcon,
-  CollectionsBookmark as CollectionsBookmarkIcon,
+  CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
   Close as CloseIcon,
-  Bookmark as BookmarkIcon,
+  FilterNone as FilterNoneIcon,
 } from '@mui/icons-material'
 import { useElectronApi, useWindowMaximize } from 'src/hooks/useElectronApi'
-
 export const TitleBar = () => {
   const electronApi = useElectronApi()
 
@@ -27,7 +26,7 @@ export const TitleBar = () => {
         <MinimizeIcon />
       </IconButton>
       <IconButton size="small" onClick={maximize} className="window-dragoff">
-        {isMaximized ? <CollectionsBookmarkIcon /> : <BookmarkIcon />}
+        {isMaximized ? <FilterNoneIcon fontSize="small" /> : <CheckBoxOutlineBlankIcon fontSize="small" />}
       </IconButton>
       <IconButton size="small" onClick={close} className="window-dragoff">
         <CloseIcon />

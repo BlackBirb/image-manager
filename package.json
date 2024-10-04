@@ -16,10 +16,12 @@
 		"@fontsource/roboto": "^5.1.0",
 		"@mui/icons-material": "^6.1.2",
 		"@mui/material": "^6.1.2",
+		"@mui/styled-engine-sc": "^6.1.2",
 		"@types/node": "22.7.4",
 		"electron": "32.1.2",
 		"react": "18.3.1",
 		"react-dom": "18.3.1",
+		"styled-components": "^6.1.13",
 		"vite-plugin-electron": "0.28.8"
 	},
 	"devDependencies": {
