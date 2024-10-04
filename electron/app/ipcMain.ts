@@ -11,9 +11,9 @@ export const createIPCApi = (windows: WindowsManager): void => {
     const win = windows[windows[evn.sender.id].name]
 
     if (win.isMaximized()) {
-      win.maximize()
-    } else {
       win.unmaximize()
+    } else {
+      win.maximize()
     }
 
     return win.isMaximized()
