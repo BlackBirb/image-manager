@@ -17,6 +17,11 @@ export default defineConfig({
         // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
         input: path.join(__dirname, 'electron/preload.ts'),
       }
-    })
+    }),
   ],
+  resolve: {
+    alias: {
+      "src": "/src",
+    },
+  },
 })
