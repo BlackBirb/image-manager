@@ -18,14 +18,14 @@ export const TitleBar = () => {
     electronApi.close()
   }
   return (
-    <Stack direction="row" alignItems="center" justifyContent="flex-end" p={0.5}>
-      <IconButton size="small" onClick={minimize}>
+    <Stack direction="row" alignItems="center" justifyContent="flex-end" p={0.5} className="window-dragon">
+      <IconButton size="small" onClick={minimize} className="window-dragoff">
         <MinimizeIcon />
       </IconButton>
-      <IconButton size="small" onClick={maximize}>
+      <IconButton size="small" onClick={maximize} className="window-dragoff">
         <CollectionsBookmarkIcon />
       </IconButton>
-      <IconButton size="small" onClick={close}>
+      <IconButton size="small" onClick={close} className="window-dragoff">
         <CloseIcon />
       </IconButton>
     </Stack>

@@ -1,0 +1,8 @@
+.window-dragon {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.window-dragoff {
+  -webkit-app-region: no-drag;
+}
