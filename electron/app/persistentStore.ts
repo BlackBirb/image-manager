@@ -12,28 +12,25 @@ interface Dict<T> {
 }
 
 const watchObj = (obj: PersistentStore, dep: DepImpl<PersistentStore>): ProxyHandler<PersistentStore> => {
-  for(const key in obj) {
-    if(typeof obj[key] === 'object')
-      obj[key] = watchObj(obj[key], dep)
+  for (const key in obj) {
+    if (typeof obj[key] === 'object') obj[key] = watchObj(obj[key], dep)
   }
   return new Proxy(obj, {
     set(target, prop, val, receiver) {
-      if(typeof val === 'object')
-        val = watchObj(val, dep)
+      if (typeof val === 'object') val = watchObj(val, dep)
       dep(target, prop, val)
       return Reflect.set(target, prop, val, receiver)
     },
     deleteProperty(target, prop) {
-      dep(target, prop, null);
+      dep(target, prop, null)
       return Reflect.deleteProperty(target, prop)
-    }
+    },
   })
 }
 
 let instance: PersistentStore | null = null
 export const getPersistentStore = async (): Promise<PersistentStore> => {
-  if(instance)
-    return instance
+  if (instance) return instance
 
   const filePath = path.join(process.env.STORAGE_PATH, 'persistent.json')
 
@@ -48,11 +45,17 @@ export const getPersistentStore = async (): Promise<PersistentStore> => {
     _store = {}
   }
 
-  instance = watchObj(_store, debounce(debouncePromise(() =>
-    writeFile(filePath, JSON.stringify(_store), {
-      encoding: 'utf-8'
-    })
-  ), 1500))
+  instance = watchObj(
+    _store,
+    debounce(
+      debouncePromise(() =>
+        writeFile(filePath, JSON.stringify(_store), {
+          encoding: 'utf-8',
+        }),
+      ),
+      50,
+    ),
+  )
 
   return instance
 }
