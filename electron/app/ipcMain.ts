@@ -1,25 +1,27 @@
-import { ipcMain } from "electron"
-
+import { ipcMain } from 'electron'
 
 export const createIPCApi = (windows: WindowsManager): void => {
+  ipcMain.on('minimizeWindow', (evn) => {
+    const win = windows[windows[evn.sender.id].name]
 
-  ipcMain.on('minimizeWindow', () => {
-    // TODO: Somehow get browser name?
-    // I know it's just one window 99% of the time but i don't trust it
-    for(const win of Object.values(windows)) {
-      win.minimize()
-    }
+    win.minimize()
   })
 
-  ipcMain.on('maximizeWindow', () => {
-    for(const win of Object.values(windows)) {
+  ipcMain.handle('toggleWindowMaximize', async (evn) => {
+    const win = windows[windows[evn.sender.id].name]
+
+    if (win.isMaximized()) {
       win.maximize()
+    } else {
+      win.restore()
     }
+
+    return win.isMaximized()
   })
 
-  ipcMain.on('closeWindow', () => {
-    for(const win of Object.values(windows)) {
-      win.close()
-    }
+  ipcMain.on('closeWindow', (evn) => {
+    const win = windows[windows[evn.sender.id].name]
+
+    win.close()
   })
 }

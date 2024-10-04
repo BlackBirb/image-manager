@@ -14,31 +14,32 @@ process.env.ELECTRON_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 process.env.REACT_ROOT = path.join(process.env.APP_ROOT, 'src')
 process.env.RENDERED_DIST = path.join(process.env.APP_ROOT, 'dist')
 
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : process.env.RENDERED_DIST
+process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
+  ? path.join(process.env.APP_ROOT, 'public')
+  : process.env.RENDERED_DIST
 
 process.env.STORAGE_PATH = path.join(app.getPath('userData'), 'storage')
 
 const windows: WindowsManager = {}
 
 const createWindow = async (name: string, url: string | null = null) => {
-  if(name in windows)
-    throw new Error("Idk honestly we'll worry when we get here")
+  if (name in windows) throw new Error("Idk honestly we'll worry when we get here")
 
   const persistentStore = await getPersistentStore()
-  if(!persistentStore[name]) {
+  if (!persistentStore[name]) {
     // Defaults
     persistentStore[name] = {
       x: 0,
       y: 0,
       width: 800,
       height: 600,
-      isMaximized: false
+      isMaximized: false,
     }
   }
 
   const win = new BrowserWindow({
     webPreferences: {
-      preload: path.join(process.env.ELECTRON_DIST, 'preload.mjs')
+      preload: path.join(process.env.ELECTRON_DIST, 'preload.mjs'),
     },
     title: name,
     x: persistentStore[name].x,
@@ -46,13 +47,12 @@ const createWindow = async (name: string, url: string | null = null) => {
     width: persistentStore[name].width,
     height: persistentStore[name].height,
     frame: false,
-    show: false
+    show: false,
   })
 
-  if(persistentStore[name].isMaximized)
-    win.maximize()
+  if (persistentStore[name].isMaximized) win.maximize()
 
-  if(url) {
+  if (url) {
     win.loadURL(url)
   } else if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL)
@@ -63,14 +63,14 @@ const createWindow = async (name: string, url: string | null = null) => {
   win.on('resize', () => {
     persistentStore[name].isMaximized = win.isMaximized()
 
-    if(persistentStore[name].isMaximized) return
+    if (persistentStore[name].isMaximized) return
 
     const bounds = win.getBounds()
     persistentStore[name] = {
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,
-      height: bounds.height
+      height: bounds.height,
     }
   })
 
@@ -78,32 +78,28 @@ const createWindow = async (name: string, url: string | null = null) => {
     win.show()
   })
 
-  if(import.meta.env.DEV) {
+  if (import.meta.env.DEV) {
     win.webContents.openDevTools()
   } else {
     // Prevent opening new windows by rendered in PROD
     win.webContents.setWindowOpenHandler(() => ({
-      action: 'deny'
+      action: 'deny',
     }))
   }
 
   windows[name] = win
+  windows[win.id].name = name
 }
 
 app.on('window-all-closed', () => {
   app.quit()
-  for(const winName in windows) {
+  for (const winName in windows) {
     delete windows[winName]
   }
 })
 
 initialSetup()
-  .then(() =>
-    Promise.all([
-      app.whenReady(),
-      getPersistentStore()
-    ])
-  )
+  .then(() => Promise.all([app.whenReady(), getPersistentStore()]))
   .then(() => {
     createWindow('main')
     createIPCApi(windows)

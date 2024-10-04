@@ -1,7 +1,7 @@
 declare namespace NodeJS {
   interface ProcessEnv {
     /** ~/ */
-    APP_ROOT: string,
+    APP_ROOT: string
 
     /** ~/electron */
     ELECTRON_ROOT: string
@@ -27,6 +27,12 @@ interface Window {
   ipcRenderer: import('electron').IpcRenderer
 }
 
+type BrowserWindowSettings = {
+  name: string
+}
+
+// It works, fight me
 interface WindowsManager {
-  [key: string]: BrowserWindow;
+  [id: number]: BrowserWindowSettings
+  [key: string]: import('electron').BrowserWindow
 }
