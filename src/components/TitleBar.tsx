@@ -1,6 +1,13 @@
+import { IconButton, Stack } from '@mui/material'
+import {
+  Minimize as MinimizeIcon,
+  CollectionsBookmark as CollectionsBookmarkIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material'
 import { useElectronApi } from 'src/hooks/useElectronApi'
-export default function TitleBar() {
+export const TitleBar = () => {
   const electronApi = useElectronApi()
+
   const minimize = () => {
     electronApi.minimize()
   }
@@ -11,24 +18,16 @@ export default function TitleBar() {
     electronApi.close()
   }
   return (
-    <>
-      {/* Will do it properly once i add material ui */}
-      <div
-        style={{
-          width: '100%',
-          backgroundColor: 'gray',
-        }}
-      >
-        <button className="interactive" onClick={minimize}>
-          _
-        </button>
-        <button className="interactive" onClick={maximize}>
-          []
-        </button>
-        <button className="interactive" onClick={close}>
-          X
-        </button>
-      </div>
-    </>
+    <Stack direction="row" alignItems="center" justifyContent="flex-end" p={0.5}>
+      <IconButton size="small" onClick={minimize}>
+        <MinimizeIcon />
+      </IconButton>
+      <IconButton size="small" onClick={maximize}>
+        <CollectionsBookmarkIcon />
+      </IconButton>
+      <IconButton size="small" onClick={close}>
+        <CloseIcon />
+      </IconButton>
+    </Stack>
   )
 }
