@@ -12,7 +12,7 @@ export const TitleBar = () => {
     electronApi.minimize()
   }
   const maximize = () => {
-    electronApi.maximize()
+    electronApi.toggleMaximize()
   }
   const close = () => {
     electronApi.close()

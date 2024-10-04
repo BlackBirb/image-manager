@@ -13,7 +13,7 @@ export const createIPCApi = (windows: WindowsManager): void => {
     if (win.isMaximized()) {
       win.maximize()
     } else {
-      win.restore()
+      win.unmaximize()
     }
 
     return win.isMaximized()
