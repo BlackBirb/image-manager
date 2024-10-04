@@ -3,16 +3,20 @@ import {
   Minimize as MinimizeIcon,
   CollectionsBookmark as CollectionsBookmarkIcon,
   Close as CloseIcon,
+  Bookmark as BookmarkIcon,
 } from '@mui/icons-material'
-import { useElectronApi } from 'src/hooks/useElectronApi'
+import { useElectronApi, useWindowMaximize } from 'src/hooks/useElectronApi'
+
 export const TitleBar = () => {
   const electronApi = useElectronApi()
+
+  const [isMaximized, toggleMaximize] = useWindowMaximize()
 
   const minimize = () => {
     electronApi.minimize()
   }
-  const maximize = () => {
-    electronApi.toggleMaximize()
+  const maximize = async () => {
+    toggleMaximize()
   }
   const close = () => {
     electronApi.close()
@@ -23,7 +27,7 @@ export const TitleBar = () => {
         <MinimizeIcon />
       </IconButton>
       <IconButton size="small" onClick={maximize} className="window-dragoff">
-        <CollectionsBookmarkIcon />
+        {isMaximized ? <CollectionsBookmarkIcon /> : <BookmarkIcon />}
       </IconButton>
       <IconButton size="small" onClick={close} className="window-dragoff">
         <CloseIcon />

@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 
 export const createIPCApi = (windows: WindowsManager): void => {
   ipcMain.on('minimizeWindow', (evn) => {
@@ -24,4 +24,9 @@ export const createIPCApi = (windows: WindowsManager): void => {
 
     win.close()
   })
+}
+
+export const addWindowIPCListeners = (win: BrowserWindow): void => {
+  win.on('maximize', () => win.webContents.send('windowMaximize'))
+  win.on('unmaximize', () => win.webContents.send('windowUnMaximize'))
 }

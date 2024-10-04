@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getPersistentStore } from './app/persistentStore'
 import { initialSetup } from './app/initialSetup'
-import { createIPCApi } from './app/ipcMain'
+import { addWindowIPCListeners, createIPCApi } from './app/ipcMain'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -22,7 +22,7 @@ process.env.STORAGE_PATH = path.join(app.getPath('userData'), 'storage')
 
 const windows: WindowsManager = {}
 
-const createWindow = async (name: string, url: string | null = null) => {
+const createWindow = async (name: string, url: string | null = null): Promise<BrowserWindow> => {
   if (name in windows) throw new Error("Idk honestly we'll worry when we get here")
 
   const persistentStore = await getPersistentStore()
@@ -74,12 +74,15 @@ const createWindow = async (name: string, url: string | null = null) => {
     }
   })
 
-  win.once('ready-to-show', () => {
-    win.show()
+  const windowShown = new Promise((resolve) => {
+    win.once('ready-to-show', () => {
+      win.show()
+      resolve(true)
+    })
   })
 
   if (import.meta.env.DEV) {
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   } else {
     // Prevent opening new windows by rendered in PROD
     win.webContents.setWindowOpenHandler(() => ({
@@ -87,10 +90,16 @@ const createWindow = async (name: string, url: string | null = null) => {
     }))
   }
 
+  await windowShown
+
   windows[name] = win
   windows[win.id] = {
     name,
   }
+
+  addWindowIPCListeners(win)
+
+  return win
 }
 
 app.on('window-all-closed', () => {
