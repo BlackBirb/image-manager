@@ -82,7 +82,7 @@ const createWindow = async (name: string, url: string | null = null): Promise<Br
   })
 
   if (import.meta.env.DEV) {
-    // win.webContents.openDevTools()
+    win.webContents.openDevTools() // I need this Black!
   } else {
     // Prevent opening new windows by rendered in PROD
     win.webContents.setWindowOpenHandler(() => ({

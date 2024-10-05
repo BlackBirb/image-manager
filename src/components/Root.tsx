@@ -1,6 +1,8 @@
 import { styled } from '@mui/material/styles'
 import { TitleBar } from 'src/components/TitleBar'
 import { Search } from 'src/components/Search'
+import { ClipboardListener } from './ClipboardListener'
+import { ImagePreview } from './ImagePreview'
 
 const GridLayout = styled('div', {
   name: 'GridLayout',
@@ -29,6 +31,8 @@ export const Root = () => {
       </div>
       <Main id="main">
         <Search />
+        <ClipboardListener />
+        <ImagePreview />
       </Main>
       <div>b</div>
     </GridLayout>

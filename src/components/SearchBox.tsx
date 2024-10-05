@@ -1,10 +1,6 @@
 import {
   Backdrop,
-  Box,
-  Chip,
   Fade,
-  IconButton,
-  InputBase,
   InputBaseProps,
   List,
   ListItem,
@@ -14,17 +10,10 @@ import {
   Popper,
   Stack,
 } from '@mui/material'
-import { Search as SearchIcon } from '@mui/icons-material'
 import { styled } from '@mui/material/styles'
 import { useCallback, useContext, useRef, useState } from 'react'
 import { SearchStateContext } from 'src/state/searchState.context'
-
-const SearchBoxx = styled(InputBase, {
-  name: 'SearchBoxx',
-})<InputBaseProps>(() => ({
-  width: '300px',
-  zIndex: 2,
-}))
+import { SearchInput } from './SearchInput'
 
 const SearchList = styled(List, {
   name: 'SearchList',
@@ -62,7 +51,7 @@ export const SearchBox = () => {
   const {
     api: { setSearchedTags },
   } = useContext(SearchStateContext)
-  const searchWrapperRef = useRef<HTMLElement>(null)
+  const searchWrapperRef = useRef<HTMLDivElement>(null)
   const [searchText, setSearchText] = useState('')
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -77,10 +66,6 @@ export const SearchBox = () => {
     })
   }
 
-  const handleRemoveTag = useCallback((deleteTag: string) => {
-    setSearchedTags((prevTags) => removeItemFromArray(prevTags, deleteTag))
-  }, [])
-
   const handleOpenList = useCallback(() => {
     setAnchorEl(searchWrapperRef.current)
   }, [])
@@ -92,23 +77,16 @@ export const SearchBox = () => {
   const open = Boolean(anchorEl)
   const id = open ? 'search-popper' : undefined
 
-  const handleOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setSearchText(event?.target?.value)
-  }, [])
-
   return (
     <Stack direction="row" alignItems="center" justifyContent="center">
-      <Box ref={searchWrapperRef} onClick={handleOpenList}>
-        <SearchBoxx
-          placeholder="Search tags"
-          inputProps={{ 'aria-label': 'Search tags' }}
-          value={searchText}
-          onChange={handleOnChange}
-        />
-        <IconButton type="button" aria-label="search">
-          <SearchIcon />
-        </IconButton>
-      </Box>
+      <SearchInput
+        placeholder="Search tags"
+        value={searchText}
+        onChange={setSearchText}
+        onClick={handleOpenList}
+        ref={searchWrapperRef}
+        withIcon
+      />
 
       <Backdrop sx={{ backgroundColor: 'transparent', zIndex: 1 }} open={open} onClick={handleCloseSearch} />
       <Popper
