@@ -60,7 +60,7 @@ const createWindow = async (name: string, url: string | null = null): Promise<Br
     win.loadFile(path.join(process.env.RENDERED_DIST, 'index.html'))
   }
 
-  win.on('resize', () => {
+  const saveWindowPosition = () => {
     persistentStore[name].isMaximized = win.isMaximized()
 
     if (persistentStore[name].isMaximized) return
@@ -72,7 +72,11 @@ const createWindow = async (name: string, url: string | null = null): Promise<Br
       width: bounds.width,
       height: bounds.height,
     }
-  })
+  }
+  win.on('resized', saveWindowPosition)
+  win.on('moved', saveWindowPosition)
+  win.on('maximize', saveWindowPosition)
+  win.on('unmaximize', saveWindowPosition)
 
   const windowShown = new Promise((resolve) => {
     win.once('ready-to-show', () => {
