@@ -3,10 +3,10 @@ import { explodingObject } from 'src/utils/explodingObject'
 
 type ClipboardStateContextType = {
   data: {
-    pastedImage: File | null
+    pastedImage: File | URL | null
   }
   api: {
-    setPastedImage: React.Dispatch<React.SetStateAction<File | null>>
+    setPastedImage: React.Dispatch<React.SetStateAction<File | URL | null>>
   }
 }
 
@@ -16,7 +16,7 @@ export const ClipboardStateContext = createContext<ClipboardStateContextType>(
 
 export const ClipboardStateContextProvider = (props: PropsWithChildren<Record<any, unknown>>) => {
   const { children } = props
-  const [pastedImage, setPastedImage] = useState<File | null>(null)
+  const [pastedImage, setPastedImage] = useState<File | URL | null>(null)
 
   const contextData = useMemo(
     () => ({

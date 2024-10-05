@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getPersistentStore } from './app/persistentStore'
@@ -21,6 +21,10 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
 process.env.STORAGE_PATH = path.join(app.getPath('userData'), 'storage')
 
 const windows: WindowsManager = {}
+
+type IDontLikeItBeingRed = {
+  env: { DEV: boolean }
+}
 
 const createWindow = async (name: string, url: string | null = null): Promise<BrowserWindow> => {
   if (name in windows) throw new Error("Idk honestly we'll worry when we get here")
@@ -85,7 +89,8 @@ const createWindow = async (name: string, url: string | null = null): Promise<Br
     })
   })
 
-  if (import.meta.env.DEV) {
+  // fight me
+  if (((<unknown>import.meta) as IDontLikeItBeingRed).env.DEV) {
     win.webContents.openDevTools() // I need this Black!
   } else {
     // Prevent opening new windows by rendered in PROD
