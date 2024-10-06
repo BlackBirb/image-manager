@@ -11,9 +11,15 @@ export const ClipboardListener = () => {
   const electronApi = useElectronApi()
 
   const [invalidPasteMessage, setInvalidPasteMessage] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
 
   const handleOkClick = useCallback(() => {
-    setInvalidPasteMessage('')
+    setOpenDialog(false)
+  }, [])
+
+  const handleOpenDialog = useCallback((newMessage: string) => {
+    setInvalidPasteMessage(newMessage)
+    setOpenDialog(true)
   }, [])
 
   useLayoutEffect(() => {
@@ -42,11 +48,11 @@ export const ClipboardListener = () => {
           console.log('pastedURL:', url.href)
           return
         } catch {
-          setInvalidPasteMessage('Invalid url image!')
+          handleOpenDialog('Invalid url image!')
         }
       }
-      setInvalidPasteMessage('No file or image URL found!')
-      console.log('No files or iamge URL found on clipboard')
+      handleOpenDialog('No file or image URL found!')
+      console.warn('No files or iamge URL found on clipboard')
     }
     window.addEventListener('paste', onPaste)
     return () => {
@@ -55,7 +61,7 @@ export const ClipboardListener = () => {
   }, [setInvalidPasteMessage])
 
   return (
-    <Dialog open={Boolean(invalidPasteMessage)}>
+    <Dialog open={openDialog}>
       <DialogTitle>{invalidPasteMessage}</DialogTitle>
       <DialogActions>
         <Button onClick={handleOkClick}>OK</Button>

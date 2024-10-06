@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { SearchInput } from './SearchInput'
+import { AddEditForm } from './FormComponents/AddEditForm'
 
 const Main = styled('div', {
   name: 'Main',
@@ -66,15 +67,10 @@ export const ImagePreview = () => {
             }}
           >
             <Stack spacing={2} width="100%" height="100%">
-              <SearchInput value={searchTags} onChange={setSearchTags} placeholder="Search tags" />
-              <Stack direction="row" spacing={2} width="100%" height="100%">
-                <Stack spacing={1} minWidth={150}>
-                  tags
-                </Stack>
-                <Stack alignItems="center" justifyContent="center" width="100%" height="100%">
-                  <ImageView src={imagePreviewUrl} />
-                </Stack>
+              <Stack alignItems="center" justifyContent="center" width="100%" height="100%" maxHeight="200px">
+                <ImageView src={imagePreviewUrl} />
               </Stack>
+              <AddEditForm />
             </Stack>
           </Paper>
         </Stack>

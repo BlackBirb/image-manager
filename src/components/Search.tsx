@@ -1,11 +1,11 @@
 import { Stack } from '@mui/material'
 import { SearchTags } from 'src/components//SearchTags'
-import { SearchBox } from 'src/components/SearchBox'
+import { SearchTagsBox } from 'src/components/SearchTagsBox'
 
 export const Search = () => {
   return (
     <Stack alignItems="center" spacing={2}>
-      <SearchBox />
+      <SearchTagsBox />
       <SearchTags />
     </Stack>
   )

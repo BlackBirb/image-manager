@@ -1,53 +1,17 @@
-import {
-  Backdrop,
-  Fade,
-  InputBaseProps,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Paper,
-  Popper,
-  Stack,
-} from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
 import { useCallback, useContext, useRef, useState } from 'react'
 import { SearchStateContext } from 'src/state/searchState.context'
 import { SearchInput } from './SearchInput'
-
-const SearchList = styled(List, {
-  name: 'SearchList',
-})<InputBaseProps>(() => ({
-  width: '100%',
-  zIndex: 2,
-  padding: 0,
-}))
-
-const SearchListItem = styled(ListItem, {
-  name: 'SearchListItem',
-})<InputBaseProps>(({ theme }) => ({
-  '&.MuiListItem-root': {
-    padding: 0,
-    '&>.MuiButtonBase-root': {
-      padding: theme.spacing(0.5),
-    },
-  },
-}))
-
-const SearchListPaper = styled(Paper, {
-  name: 'SearchListPaper',
-})<InputBaseProps>(({ theme }) => ({
-  marginTop: theme.spacing(1),
-  maxHeight: '300px',
-}))
+import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
 
 function removeItemFromArray(arr: string[], item: string) {
   return arr.filter((t) => t !== item)
 }
 
+// Will come from db.
 const mockTags = ['dragon', 'cat', 'dog']
 
-export const SearchBox = () => {
+export const SearchTagsBox = () => {
   const {
     api: { setSearchedTags },
   } = useContext(SearchStateContext)
@@ -101,27 +65,29 @@ export const SearchBox = () => {
       >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps}>
-            <SearchListPaper
-              sx={{
-                width: searchWrapperRef?.current?.offsetWidth || 'auto',
-              }}
-            >
-              <SearchList dense>
-                {mockTags.map((tag) => {
-                  return (
-                    <SearchListItem key={tag}>
-                      <ListItemButton
-                        onClick={() => {
-                          handleOnTagClick(tag)
-                        }}
-                      >
-                        <ListItemText primary={tag} />
-                      </ListItemButton>
-                    </SearchListItem>
-                  )
-                })}
-              </SearchList>
-            </SearchListPaper>
+            <Box mt={1}>
+              <SearchListPaper
+                sx={{
+                  width: searchWrapperRef?.current?.offsetWidth || 'auto',
+                }}
+              >
+                <SearchList dense>
+                  {mockTags.map((tag) => {
+                    return (
+                      <SearchListItem key={tag}>
+                        <ListItemButton
+                          onClick={() => {
+                            handleOnTagClick(tag)
+                          }}
+                        >
+                          <ListItemText primary={tag} />
+                        </ListItemButton>
+                      </SearchListItem>
+                    )
+                  })}
+                </SearchList>
+              </SearchListPaper>
+            </Box>
           </Fade>
         )}
       </Popper>
