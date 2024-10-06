@@ -1,8 +1,8 @@
 import { Backdrop, Button, Dialog, DialogActions, DialogTitle, Paper as MuiPaper, Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useState } from 'react'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
-import { SearchInput } from './SearchInput'
+
 import { AddEditForm } from './FormComponents/AddEditForm'
 
 const Main = styled('div', {
@@ -38,8 +38,6 @@ export const ImagePreview = () => {
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
 
-  const [searchTags, setSearchTags] = useState('')
-
   const [alert, setAlert] = useState(false)
 
   const handleBackdropClose = useCallback(() => {
@@ -56,6 +54,7 @@ export const ImagePreview = () => {
   }, [])
 
   if (!imagePreviewUrl) return null
+
   return (
     <>
       <Backdrop id="image-preview-back-drop" open onClick={handleBackdropClose} />

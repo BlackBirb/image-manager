@@ -1,7 +1,7 @@
-import { Chip, ListItemButton, ListItemText, Popover, Stack, Typography } from '@mui/material'
-import { SearchInput } from '../SearchInput'
+import { Chip, ListItemButton, ListItemText, Popover, Stack } from '@mui/material'
 import { useCallback, useRef, useState } from 'react'
-import { SearchList, SearchListItem, SearchListPaper } from '../MiscComponents'
+import { SearchList, SearchListItem, SearchListPaper } from 'src/components/MiscComponents'
+import { SearchInput } from 'src/components/SearchInput'
 import { removeItemFromArray } from 'src/utils/utils'
 
 const mockTags = ['dragon', 'cat', 'dog']
@@ -25,23 +25,29 @@ export const TagsInput = (props: TagsInputProps) => {
     setAnchorEl(null)
   }, [])
 
-  const handleOnTagClick = useCallback((clickedTag: string) => {
-    let newTags = [...tags]
-    if (newTags.find((t) => t === clickedTag)) {
-      newTags = removeItemFromArray(newTags, clickedTag)
-    } else {
-      newTags.push(clickedTag)
-    }
-    setTags(newTags)
-  }, [])
+  const handleOnTagClick = useCallback(
+    (clickedTag: string) => {
+      let newTags = [...tags]
+      if (newTags.find((t) => t === clickedTag)) {
+        newTags = removeItemFromArray(newTags, clickedTag)
+      } else {
+        newTags.push(clickedTag)
+      }
+      setTags(newTags)
+    },
+    [tags],
+  )
 
-  const handleOnRemoveTag = useCallback((tag: string) => {
-    let newTags = [...tags]
-    if (newTags.find((t) => t === tag)) {
-      newTags = removeItemFromArray(newTags, tag)
-    }
-    setTags(newTags)
-  }, [])
+  const handleOnRemoveTag = useCallback(
+    (tag: string) => {
+      let newTags = [...tags]
+      if (newTags.find((t) => t === tag)) {
+        newTags = removeItemFromArray(newTags, tag)
+      }
+      setTags(newTags)
+    },
+    [tags],
+  )
 
   const open = Boolean(anchorEl)
   const id = open ? 'search-popper' : undefined

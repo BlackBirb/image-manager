@@ -1,9 +1,11 @@
-import { app, BrowserWindow } from 'electron'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { getPersistentStore } from './app/persistentStore'
+import { fileURLToPath } from 'node:url'
+
+import { app, BrowserWindow } from 'electron'
+
 import { initialSetup } from './app/initialSetup'
 import { addWindowIPCListeners, createIPCApi } from './app/ipcMain'
+import { getPersistentStore } from './app/persistentStore'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

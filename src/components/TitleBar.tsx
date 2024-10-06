@@ -1,10 +1,10 @@
-import { IconButton, Stack } from '@mui/material'
 import {
   Minimize as MinimizeIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
   Close as CloseIcon,
   FilterNone as FilterNoneIcon,
 } from '@mui/icons-material'
+import { IconButton, Stack } from '@mui/material'
 import { useElectronApi, useWindowMaximize } from 'src/hooks/useElectronApi'
 export const TitleBar = () => {
   const electronApi = useElectronApi()

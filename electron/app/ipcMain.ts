@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain } from 'electron'
+
 import { fetchURLMime } from './imageService'
 
 export const createIPCApi = (windows: WindowsManager): void => {

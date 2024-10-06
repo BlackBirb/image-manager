@@ -5,5 +5,5 @@ export const explodingObject = <T>(message: string): T =>
       get: () => {
         throw new Error(message)
       },
-    }
+    },
   ) as T

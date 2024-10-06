@@ -42,7 +42,7 @@ export const ClipboardStateContextProvider = (props: PropsWithChildren<Record<an
         setPastedImage,
       },
     }),
-    [pastedImage, setPastedImage],
+    [imagePreviewUrl, pastedImage, setPastedImage],
   )
 
   return <ClipboardStateContext.Provider value={contextData}>{children}</ClipboardStateContext.Provider>

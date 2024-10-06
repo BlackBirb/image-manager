@@ -26,12 +26,11 @@ const eslintConfig = [
       '.out/*',
       '!.prettierrc.js',
       'dist/*',
+      'dist-electron/*',
       'build/*',
       'vite.config.mjs',
       'vite.config.mjs.timestamp-*.mjs',
       'eslint.config.mjs',
-      'src/lib/wasm_exec.js',
-      'src/lib/wasm_wrapper.js',
     ],
   },
   ...fixupConfigRules(
@@ -77,7 +76,7 @@ const eslintConfig = [
 
       'import/resolver': {
         typescript: {},
-        node: true,
+        node: true
       },
     },
 
@@ -116,7 +115,7 @@ const eslintConfig = [
       'no-console': [
         'error',
         {
-          allow: ['error', 'info'],
+          allow: ['error', 'info',"warn"],
         },
       ],
 

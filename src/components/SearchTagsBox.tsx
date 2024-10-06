@@ -1,8 +1,9 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
 import { useCallback, useContext, useRef, useState } from 'react'
 import { SearchStateContext } from 'src/state/searchState.context'
-import { SearchInput } from './SearchInput'
+
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
+import { SearchInput } from './SearchInput'
 
 function removeItemFromArray(arr: string[], item: string) {
   return arr.filter((t) => t !== item)

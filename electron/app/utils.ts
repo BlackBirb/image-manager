@@ -7,16 +7,15 @@ export const debouncePromise = (fn: () => Promise<any>) => {
     cancelPrev()
     let currRunning = true
     runningPromise.then(() => {
-      if(!currRunning) return
+      if (!currRunning) return
       runningPromise = fn()
     })
-    cancelPrev = () => currRunning = true
+    cancelPrev = () => (currRunning = true)
   }
 }
 
-
 export const debounce = (fn: () => any, delay = 200) => {
-  let timeoutId: NodeJS.Timeout | undefined;
+  let timeoutId: NodeJS.Timeout | undefined
   const debounced = (...args: unknown[]) => {
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => fn.apply(this, args as []), delay)

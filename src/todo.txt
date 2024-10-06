@@ -1,0 +1,11 @@
+Dashboard Grid images, right click with options to:
+edit image
+copy image path
+copy image (sharing)
+copy image url (sharing)(if it exists)
+
+
+When open Image top right icon button for going directly into edit mode.
+
+User default options: (preferences)
+sfw / nsfw switch

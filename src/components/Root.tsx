@@ -1,6 +1,7 @@
 import { styled } from '@mui/material/styles'
-import { TitleBar } from 'src/components/TitleBar'
 import { Search } from 'src/components/Search'
+import { TitleBar } from 'src/components/TitleBar'
+
 import { ClipboardListener } from './ClipboardListener'
 import { ImagePreview } from './ImagePreview'
 

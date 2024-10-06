@@ -1,15 +1,14 @@
-import { mkdir, stat } from "fs/promises"
-
+import { mkdir, stat } from 'fs/promises'
 
 const createStorageFolder = async () => {
   try {
     await stat(process.env.STORAGE_PATH)
     return true
-  } catch(err: unknown) {
+  } catch (err: unknown) {
     // I hate TS
-    if(err instanceof Error && err.code === 'ENOENT') {
+    if (err instanceof Error && err.code === 'ENOENT') {
       await mkdir(process.env.STORAGE_PATH, {
-        recursive: true
+        recursive: true,
       })
       return false
     }
@@ -21,7 +20,5 @@ const createStorageFolder = async () => {
 
 export const initialSetup = async () => {
   const storage = await createStorageFolder()
-  if(storage)
-    return true
-
+  if (storage) return true
 }

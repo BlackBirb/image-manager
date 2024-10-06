@@ -1,5 +1,6 @@
-import path from 'node:path'
 import { writeFile, readFile } from 'node:fs/promises'
+import path from 'node:path'
+
 import { debounce, debouncePromise } from './utils'
 
 type DepImpl<T> = (target: T, prop: string | symbol, val: T[] | null) => void

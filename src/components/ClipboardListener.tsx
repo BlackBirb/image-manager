@@ -58,7 +58,7 @@ export const ClipboardListener = () => {
     return () => {
       window.removeEventListener('paste', onPaste)
     }
-  }, [setInvalidPasteMessage])
+  }, [handleOpenDialog, setPastedImage])
 
   return (
     <Dialog open={openDialog}>

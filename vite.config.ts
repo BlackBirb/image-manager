@@ -1,12 +1,15 @@
-import { defineConfig } from 'vite'
 import path from 'node:path'
+
 import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 import electronSimple from 'vite-plugin-electron/simple'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    tsconfigPaths(),
     electronSimple({
       main: {
         // Shortcut of `build.lib.entry`.
@@ -16,12 +19,12 @@ export default defineConfig({
         // Shortcut of `build.rollupOptions.input`.
         // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
         input: path.join(__dirname, 'electron/preload.ts'),
-      }
+      },
     }),
   ],
   resolve: {
     alias: {
-      "src": "/src",
+      src: '/src',
     },
   },
 })

@@ -1,6 +1,6 @@
+import { Search as SearchIcon } from '@mui/icons-material'
 import { Box, IconButton, InputBase, InputBaseProps, styled } from '@mui/material'
 import { forwardRef, useCallback } from 'react'
-import { Search as SearchIcon } from '@mui/icons-material'
 
 const SearchInputBox = styled(InputBase, {
   name: 'SearchInput',
@@ -39,3 +39,5 @@ export const SearchInput = forwardRef((props: SearchInputProps, ref: React.Forwa
     </Box>
   )
 })
+
+SearchInput.displayName = 'SearchInput'
