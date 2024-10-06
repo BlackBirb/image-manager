@@ -11,6 +11,14 @@ const Main = styled('div', {
   inset: 0,
 }))
 
+const ImageView = styled('img', {
+  name: 'ImageView',
+})(() => ({
+  width: '100%',
+  height: '100%',
+  objectFit: 'contain',
+}))
+
 const Paper = styled(MuiPaper, {
   name: 'Paper',
 })(({ theme }) => ({
@@ -25,26 +33,13 @@ const Paper = styled(MuiPaper, {
 
 export const ImagePreview = () => {
   const {
-    data: { pastedImage },
+    data: { imagePreviewUrl },
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
 
   const [searchTags, setSearchTags] = useState('')
 
   const [alert, setAlert] = useState(false)
-
-  const imagePreview = useMemo(() => {
-    if (!pastedImage) return
-    let imageBlob = null
-    try {
-      if (pastedImage instanceof File) imageBlob = URL.createObjectURL(pastedImage)
-      // Apparently it works? I expected cors but no, all the sources I checked work fine
-      else imageBlob = pastedImage.href
-    } catch {
-      console.error('Failed to create preview of the pasted file!')
-    }
-    return imageBlob
-  }, [pastedImage])
 
   const handleBackdropClose = useCallback(() => {
     setAlert(true)
@@ -59,7 +54,7 @@ export const ImagePreview = () => {
     setPastedImage(null)
   }, [])
 
-  if (!pastedImage) return null
+  if (!imagePreviewUrl) return null
   return (
     <>
       <Backdrop id="image-preview-back-drop" open onClick={handleBackdropClose} />
@@ -77,9 +72,7 @@ export const ImagePreview = () => {
                   tags
                 </Stack>
                 <Stack alignItems="center" justifyContent="center" width="100%" height="100%">
-                  {imagePreview && (
-                    <img src={imagePreview} width="100%" height="100%" style={{ objectFit: 'contain' }} />
-                  )}
+                  <ImageView src={imagePreviewUrl} />
                 </Stack>
               </Stack>
             </Stack>

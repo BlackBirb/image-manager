@@ -1,4 +1,5 @@
-import { useContext, useLayoutEffect } from 'react'
+import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
+import { useCallback, useContext, useLayoutEffect, useState } from 'react'
 import { useElectronApi } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 
@@ -9,6 +10,12 @@ export const ClipboardListener = () => {
 
   const electronApi = useElectronApi()
 
+  const [invalidPasteMessage, setInvalidPasteMessage] = useState('')
+
+  const handleOkClick = useCallback(() => {
+    setInvalidPasteMessage('')
+  }, [])
+
   useLayoutEffect(() => {
     const onPaste = async (event: ClipboardEvent) => {
       event.stopPropagation()
@@ -17,7 +24,6 @@ export const ClipboardListener = () => {
           if (event.clipboardData.files[i].type.startsWith('image/')) {
             const pastedImage = event.clipboardData.files[i]
             setPastedImage(pastedImage)
-            console.log('pastedImage: ', pastedImage)
             break
           }
         }
@@ -36,16 +42,24 @@ export const ClipboardListener = () => {
           console.log('pastedURL:', url.href)
           return
         } catch {
-          // invalid URL
+          setInvalidPasteMessage('Invalid url image!')
         }
       }
+      setInvalidPasteMessage('No file or image URL found!')
       console.log('No files or iamge URL found on clipboard')
     }
     window.addEventListener('paste', onPaste)
     return () => {
       window.removeEventListener('paste', onPaste)
     }
-  }, [])
+  }, [setInvalidPasteMessage])
 
-  return null
+  return (
+    <Dialog open={Boolean(invalidPasteMessage)}>
+      <DialogTitle>{invalidPasteMessage}</DialogTitle>
+      <DialogActions>
+        <Button onClick={handleOkClick}>OK</Button>
+      </DialogActions>
+    </Dialog>
+  )
 }
