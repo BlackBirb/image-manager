@@ -1,9 +1,14 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
-import { useCallback, useContext, useRef, useState } from 'react'
-import { SearchStateContext } from 'src/state/searchState.context'
+import { useCallback, useRef, useState } from 'react'
 
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
 import { SearchInput } from './SearchInput'
+
+type SearchTagsBoxProps = {
+  tags: string[]
+  setTags: (newTags: string[]) => void,
+  allowNew?: boolean
+}
 
 function removeItemFromArray(arr: string[], item: string) {
   return arr.filter((t) => t !== item)
@@ -12,23 +17,21 @@ function removeItemFromArray(arr: string[], item: string) {
 // Will come from db.
 const mockTags = ['dragon', 'cat', 'dog']
 
-export const SearchTagsBox = () => {
-  const {
-    api: { setSearchedTags },
-  } = useContext(SearchStateContext)
+export const SearchTagsBox = (props: SearchTagsBoxProps) => {
+  const { tags, setTags, allowNew } = props
   const searchWrapperRef = useRef<HTMLDivElement>(null)
-  const [searchText, setSearchText] = useState('')
+  const [searchText, setSearchText] = useState<string>('')
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const handleOnTagClick = (clickedTag: string) => {
-    setSearchedTags((prevTags) => {
-      if (prevTags.find((t) => t === clickedTag)) {
-        return removeItemFromArray(prevTags, clickedTag)
-      }
-      const newTags = [...prevTags]
-      newTags.push(clickedTag)
-      return newTags
-    })
+    setSearchText('')
+
+    if (tags.includes(clickedTag)) {
+      return setTags(removeItemFromArray(tags, clickedTag))
+    }
+    const newTags = [...tags]
+    newTags.push(clickedTag)
+    return setTags(newTags)
   }
 
   const handleOpenList = useCallback(() => {
@@ -39,16 +42,27 @@ export const SearchTagsBox = () => {
     setAnchorEl(null)
   }, [])
 
-  const open = Boolean(anchorEl)
+  const handleEnter = () => {
+    console.log(allowNew, mockTags[0])
+    if(allowNew) {
+      handleOnTagClick(searchText)
+      return
+    }
+    // We assyme they're sorted by best match
+    handleOnTagClick(mockTags[0])
+  }
+
+  const open = searchText.length > 0 && Boolean(anchorEl)
   const id = open ? 'search-popper' : undefined
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="center">
+    <Stack direction="row" alignItems="center">
       <SearchInput
         placeholder="Search tags"
         value={searchText}
         onChange={setSearchText}
         onClick={handleOpenList}
+        onEnter={handleEnter}
         ref={searchWrapperRef}
         withIcon
       />
