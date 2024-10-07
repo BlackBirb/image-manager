@@ -57,24 +57,24 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   // options in the list. I can probably use the stupid mui autocomplete
   // but i hate it, so will think of something DIY.
   const handleEnter = useCallback(() => {
-    console.log(allowNew, mockTags[0])
+    // We assume they're sorted by best match
+    if (listIndex > -1) {
+      handleOnTagClick(filteredTags[listIndex])
+      return
+    }
+
     if (allowNew) {
       handleOnTagClick(searchText)
       return
     }
-    // We assume they're sorted by best match
-    if (listIndex > 0) {
-      handleOnTagClick(filteredTags[listIndex])
-    }
   }, [allowNew, listIndex, searchText, filteredTags, handleOnTagClick])
 
-  // Doesn't work if index is 0 or something idk. need to debug
   const handleOnArrowUpDown = useCallback(
     (direction: 'ArrowUp' | 'ArrowDown') => {
       if (!searchText) return
       if (direction === 'ArrowUp') {
         setListIndex((prevIndex) => {
-          if (listIndex > 0) {
+          if (listIndex > -1) {
             return prevIndex - 1
           }
           return prevIndex
