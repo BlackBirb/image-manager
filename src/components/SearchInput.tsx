@@ -13,24 +13,31 @@ type SearchInputProps = {
   value: string
   placeholder?: string
   onChange: (value: string) => void
-  onClick?: () => void,
-  onEnter?: () => void,
+  onClick?: () => void
+  onEnter?: () => void
   withIcon?: boolean
 }
 
 export const SearchInput = forwardRef((props: SearchInputProps, ref: React.ForwardedRef<HTMLDivElement | null>) => {
   const { value, placeholder, onChange, onClick, onEnter, withIcon } = props
-  const handleOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    onChange(event?.target?.value)
-  }, [])
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if(!onEnter) return
+  const handleOnChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      onChange(event?.target?.value)
+    },
+    [onChange],
+  )
 
-    if(event.key === 'Enter') {
-      onEnter()
-    }
-  }, [ onEnter ])
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (!onEnter) return
+
+      if (event.key === 'Enter') {
+        onEnter()
+      }
+    },
+    [onEnter],
+  )
 
   return (
     <Box ref={ref} onClick={onClick}>

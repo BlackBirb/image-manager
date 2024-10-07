@@ -1,7 +1,6 @@
 import { Stack } from '@mui/material'
-import { SearchTagsBox } from '../SearchTagsBox'
-import { SearchTags } from '../SearchTags'
-
+import { SearchTags } from 'src/components/SearchTags'
+import { SearchTagsBox } from 'src/components/SearchTagsBox'
 
 type TagsInputProps = {
   tags: string[]
@@ -13,15 +12,8 @@ export const TagsInput = (props: TagsInputProps) => {
 
   return (
     <Stack alignItems="left" spacing={2}>
-      <SearchTagsBox
-        tags={tags}
-        setTags={setTags}
-        allowNew
-      />
-      <SearchTags
-        tags={tags}
-        setTags={setTags}
-      />
+      <SearchTagsBox tags={tags} setTags={setTags} allowNew />
+      <SearchTags tags={tags} setTags={setTags} />
     </Stack>
   )
 }

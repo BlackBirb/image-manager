@@ -1,12 +1,12 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
 import { SearchInput } from './SearchInput'
 
 type SearchTagsBoxProps = {
   tags: string[]
-  setTags: (newTags: string[]) => void,
+  setTags: (newTags: string[]) => void
   allowNew?: boolean
 }
 
@@ -20,19 +20,29 @@ const mockTags = ['dragon', 'cat', 'dog']
 export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   const { tags, setTags, allowNew } = props
   const searchWrapperRef = useRef<HTMLDivElement>(null)
+  // This will probably go to the DB handler who will do the filtering
+  // and return the list of tags
   const [searchText, setSearchText] = useState<string>('')
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const handleOnTagClick = (clickedTag: string) => {
-    setSearchText('')
+  // Probably will be filtered somewhere else. TBD
+  const filteredTags = useMemo(() => {
+    return mockTags.filter((t) => !tags.includes(t))
+  }, [tags])
 
-    if (tags.includes(clickedTag)) {
-      return setTags(removeItemFromArray(tags, clickedTag))
-    }
-    const newTags = [...tags]
-    newTags.push(clickedTag)
-    return setTags(newTags)
-  }
+  const handleOnTagClick = useCallback(
+    (clickedTag: string) => {
+      setSearchText('')
+
+      if (tags.includes(clickedTag)) {
+        return setTags(removeItemFromArray(tags, clickedTag))
+      }
+      const newTags = [...tags]
+      newTags.push(clickedTag)
+      return setTags(newTags)
+    },
+    [tags, setTags],
+  )
 
   const handleOpenList = useCallback(() => {
     setAnchorEl(searchWrapperRef.current)
@@ -42,15 +52,20 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
     setAnchorEl(null)
   }, [])
 
-  const handleEnter = () => {
+  // I will want to make this when we arrow down, to tabIndex select the
+  // options in the list. I can probably use the stupid mui autocomplete
+  // but i hate it, so will think of something DIY.
+  const handleEnter = useCallback(() => {
     console.log(allowNew, mockTags[0])
-    if(allowNew) {
+    if (allowNew) {
       handleOnTagClick(searchText)
       return
     }
-    // We assyme they're sorted by best match
-    handleOnTagClick(mockTags[0])
-  }
+    // We assume they're sorted by best match
+    if (filteredTags.length) {
+      handleOnTagClick(filteredTags[0])
+    }
+  }, [allowNew, searchText, filteredTags, handleOnTagClick])
 
   const open = searchText.length > 0 && Boolean(anchorEl)
   const id = open ? 'search-popper' : undefined
@@ -87,7 +102,7 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
                 }}
               >
                 <SearchList dense>
-                  {mockTags.map((tag) => {
+                  {filteredTags.map((tag) => {
                     return (
                       <SearchListItem key={tag}>
                         <ListItemButton

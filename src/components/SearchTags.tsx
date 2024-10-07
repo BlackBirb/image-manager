@@ -10,9 +10,12 @@ type SearchTagsProps = {
 export const SearchTags = (props: SearchTagsProps) => {
   const { tags, setTags } = props
 
-  const handleRemoveTag = useCallback((deleteTag: string) => {
-    setTags(removeItemFromArray(tags, deleteTag))
-  }, [ tags ])
+  const handleRemoveTag = useCallback(
+    (deleteTag: string) => {
+      setTags(removeItemFromArray(tags, deleteTag))
+    },
+    [tags],
+  )
 
   return (
     <Stack direction="row" spacing={1}>

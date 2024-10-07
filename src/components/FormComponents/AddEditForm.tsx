@@ -102,13 +102,13 @@ export const AddEditForm = () => {
   }
 
   useEffect(() => {
-    if(pastedImage instanceof URL)
+    if (pastedImage instanceof URL)
       setFormData((oldFormData) => {
         const newFormData = cloneDeep(oldFormData) as AddEditFormType
         newFormData.sourceUrl = pastedImage.href
         return newFormData
       })
-  }, [ pastedImage ])
+  }, [pastedImage])
 
   return (
     <Stack spacing={2} height="100%" justifyContent="space-between">

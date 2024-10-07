@@ -12,14 +12,8 @@ export const Search = () => {
 
   return (
     <Stack alignItems="center" spacing={2}>
-      <SearchTagsBox
-        tags={searchedTags}
-        setTags={setSearchedTags}
-      />
-      <SearchTags
-        tags={searchedTags}
-        setTags={setSearchedTags}
-      />
+      <SearchTagsBox tags={searchedTags} setTags={setSearchedTags} />
+      <SearchTags tags={searchedTags} setTags={setSearchedTags} />
     </Stack>
   )
 }
