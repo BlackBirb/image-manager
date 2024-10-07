@@ -1,5 +1,5 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
 import { SearchInput } from './SearchInput'
@@ -24,6 +24,7 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   // and return the list of tags
   const [searchText, setSearchText] = useState<string>('')
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [listIndex, setListIndex] = useState(-1)
 
   // Probably will be filtered somewhere else. TBD
   const filteredTags = useMemo(() => {
@@ -62,10 +63,38 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
       return
     }
     // We assume they're sorted by best match
-    if (filteredTags.length) {
-      handleOnTagClick(filteredTags[0])
+    if (listIndex > 0) {
+      handleOnTagClick(filteredTags[listIndex])
     }
-  }, [allowNew, searchText, filteredTags, handleOnTagClick])
+  }, [allowNew, listIndex, searchText, filteredTags, handleOnTagClick])
+
+  // Doesn't work if index is 0 or something idk. need to debug
+  const handleOnArrowUpDown = useCallback(
+    (direction: 'ArrowUp' | 'ArrowDown') => {
+      if (!searchText) return
+      if (direction === 'ArrowUp') {
+        setListIndex((prevIndex) => {
+          if (listIndex > 0) {
+            return prevIndex - 1
+          }
+          return prevIndex
+        })
+      }
+      if (direction === 'ArrowDown') {
+        setListIndex((prevIndex) => {
+          if (listIndex < filteredTags.length - 1) {
+            return prevIndex + 1
+          }
+          return prevIndex
+        })
+      }
+    },
+    [searchText, filteredTags.length, listIndex],
+  )
+
+  useEffect(() => {
+    setListIndex(-1)
+  }, [searchText])
 
   const open = searchText.length > 0 && Boolean(anchorEl)
   const id = open ? 'search-popper' : undefined
@@ -78,6 +107,7 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
         onChange={setSearchText}
         onClick={handleOpenList}
         onEnter={handleEnter}
+        onArrowUpDown={handleOnArrowUpDown}
         ref={searchWrapperRef}
         withIcon
       />
@@ -102,10 +132,11 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
                 }}
               >
                 <SearchList dense>
-                  {filteredTags.map((tag) => {
+                  {filteredTags.map((tag, index) => {
                     return (
                       <SearchListItem key={tag}>
                         <ListItemButton
+                          selected={listIndex === index}
                           onClick={() => {
                             handleOnTagClick(tag)
                           }}
