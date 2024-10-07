@@ -1,7 +1,7 @@
 import { Add as AddIcon, Close as CloseIcon } from '@mui/icons-material'
 import { Box, Button, IconButton, Stack, Switch, TextField, Typography } from '@mui/material'
 import cloneDeep from 'lodash/cloneDeep'
-import { useCallback, useContext, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { TagsInput } from 'src/components/FormComponents/TagsInput'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { v4 as uuid } from 'uuid'
@@ -31,8 +31,10 @@ const defaultNewFormData: AddEditFormType = {
 
 export const AddEditForm = () => {
   const {
+    data: { pastedImage },
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
+
   const [formData, setFormData] = useState<AddEditFormType>(defaultNewFormData)
 
   const handleSetTags = useCallback((newTags: string[]) => {
@@ -98,6 +100,15 @@ export const AddEditForm = () => {
     // Call the DB, save/update the data
     setPastedImage(null)
   }
+
+  useEffect(() => {
+    if(pastedImage instanceof URL)
+      setFormData((oldFormData) => {
+        const newFormData = cloneDeep(oldFormData) as AddEditFormType
+        newFormData.sourceUrl = pastedImage.href
+        return newFormData
+      })
+  }, [ pastedImage ])
 
   return (
     <Stack spacing={2} height="100%" justifyContent="space-between">
