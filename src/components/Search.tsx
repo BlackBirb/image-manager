@@ -11,7 +11,7 @@ export const Search = () => {
   } = useContext(SearchStateContext)
 
   return (
-    <Stack spacing={2}>
+    <Stack>
       <SearchTagsBox tags={searchedTags} setTags={setSearchedTags} />
       <SearchTags tags={searchedTags} setTags={setSearchedTags} />
     </Stack>

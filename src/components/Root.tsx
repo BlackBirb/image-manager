@@ -6,6 +6,7 @@ import { ClipboardListener } from './ClipboardListener'
 import { ImagePreview } from './ImagePreview'
 import { Stack } from '@mui/material'
 import { UserPreferences } from 'src/components/UserPreferences'
+import { ImageGallery } from 'src/components/ImageGallery'
 
 const GridLayout = styled('div', {
   name: 'GridLayout',
@@ -21,10 +22,9 @@ const GridLayout = styled('div', {
 
 const Main = styled('section', {
   name: 'Main',
-})(({ theme }) => ({
+})(() => ({
   height: '100%',
   width: '100%',
-  padding: theme.spacing(4)
 }))
 
 export const Root = () => {
@@ -34,11 +34,15 @@ export const Root = () => {
         <TitleBar />
       </div>
       <Main id="main">
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Search />
-          <UserPreferences />
+        <Stack height="100%">
+          <Stack direction="row" justifyContent="space-between" pl={4} pr={2}>
+            <Search />
+            <UserPreferences />
+          </Stack>
+          <Stack flexGrow={1} p={4}>
+            <ImageGallery />
+          </Stack>
         </Stack>
-        <div>b</div>
         <ClipboardListener />
         <ImagePreview />
       </Main>

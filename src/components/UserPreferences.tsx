@@ -1,5 +1,5 @@
 import { Settings as SettingsIcon } from '@mui/icons-material'
-import { Box, FormControl, IconButton, InputLabel, MenuItem, Paper, Popover, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
+import { Box, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, Paper, Popover, Select, SelectChangeEvent, Stack, Switch, TextField, Typography } from '@mui/material'
 import { useCallback, useState } from 'react'
 
 export const UserPreferences = () => {
@@ -20,6 +20,9 @@ export const UserPreferences = () => {
     // setAge(event.target.value as string);
   };
   const handleOnChangePagination = (event: SelectChangeEvent) => {
+    // setAge(event.target.value as string);
+  };
+  const handleOnDesignChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     // setAge(event.target.value as string);
   };
   return (
@@ -71,6 +74,7 @@ export const UserPreferences = () => {
             <TextField label="Folder Path" disabled>
               The chosen path where the images are stored in the beginning of the app.
             </TextField>
+            <FormControlLabel control={<Switch onChange={handleOnDesignChange} value={false} />} label="Exiting design" />
           </Stack>
         </Paper>
       </Popover>
