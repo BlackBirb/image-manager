@@ -47,7 +47,7 @@ const eslintConfig = [
   {
     plugins: {
       '@typescript-eslint': fixupPluginRules(typescriptEslint),
-      'unused-imports': unusedImports,
+      // 'unused-imports': unusedImports,
       'no-relative-import-paths': noRelativeImportPaths,
       import: fixupPluginRules(_import),
     },
@@ -174,7 +174,6 @@ const eslintConfig = [
       ],
 
       '@typescript-eslint/no-empty-interface': 'error',
-
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
