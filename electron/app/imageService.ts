@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { writeFile } from 'node:fs/promises'
+import { stat, mkdir, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { getMimeExtension } from './utils'
 
@@ -18,13 +18,40 @@ export const fetchImage = async (url: string) => {
 
   const data = await response.arrayBuffer()
 
+  // TODO: Needs dir
   return saveImage(data, mime, process.env.APP_ROOT)
 }
 
 // dir can be later changed to some global "current setting"?
+// Should we check if file exists first? or does frontend with DB deal with that
+// tho how if it's called from fetchImage...
+// But if hash is the same we can overwrite it without worries, it's identical image right?
 export const saveImage = async (data: ArrayBuffer, mime: string, dir: string) => {
   const hash = getImageHash(data)
-  writeFile(getIamgePath(hash, mime, dir), Buffer.from(data))
+  const imagePath = getIamgePath(hash, mime, dir)
+
+  // ensure directory is there
+  const dirPath = imagePath
+    .split(/[\\\/]/)
+    .slice(0, -1)
+    .join('/')
+
+  try {
+    const stats = await stat(dirPath)
+    if (!stats.isDirectory()) throw `Somehow the hash directory is a file for: ${imagePath}`
+  } catch (err: any) {
+    if (err.code && err.code === 'ENOENT') {
+      await mkdir(dirPath, {
+        recursive: true,
+      })
+    } else {
+      throw err
+    }
+  }
+
+  writeFile(imagePath, Buffer.from(data))
+
+  return hash
 }
 
 export const getImageHash = (data: ArrayBuffer): string => {
@@ -36,4 +63,4 @@ export const getImageHash = (data: ArrayBuffer): string => {
 }
 
 export const getIamgePath = (imageHash: string, mime: string, dir: string) =>
-  path.join(dir, imageHash.slice(0, 2) + imageHash.slice(2) + '.' + getMimeExtension(mime))
+  path.join(dir, imageHash.slice(0, 2), imageHash.slice(2) + '.' + getMimeExtension(mime))

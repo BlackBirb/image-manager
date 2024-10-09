@@ -33,8 +33,9 @@ export const createIPCApi = (windows: WindowsManager): void => {
   })
 
   ipcMain.handle('fetchImage', async (_evn, url) => {
-    const mime = await fetchImage(url)
-    return mime
+    const hash = await fetchImage(url)
+    console.log({ hash })
+    return hash
   })
 }
 
