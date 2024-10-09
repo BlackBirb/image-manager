@@ -5,6 +5,7 @@ export const toggleMaximize = () => ipcRenderer.invoke('toggleWindowMaximize')
 export const close = () => ipcRenderer.send('closeWindow')
 
 export const getURLMime = (url: string): Promise<string> => ipcRenderer.invoke('getURLMime', url)
+export const fetchImage = (url: string): Promise<string> => ipcRenderer.invoke('fetchImage', url)
 
 export const onWindowMaximize = (cb: (maximized: boolean) => void) => {
   const onMaximize = () => cb(true)

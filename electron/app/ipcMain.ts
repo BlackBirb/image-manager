@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { fetchURLMime } from './imageService'
+import { fetchImage, fetchURLMime } from './imageService'
 
 export const createIPCApi = (windows: WindowsManager): void => {
   ipcMain.on('minimizeWindow', (evn) => {
@@ -29,6 +29,11 @@ export const createIPCApi = (windows: WindowsManager): void => {
 
   ipcMain.handle('getURLMime', async (_evn, url) => {
     const mime = await fetchURLMime(url)
+    return mime
+  })
+
+  ipcMain.handle('fetchImage', async (_evn, url) => {
+    const mime = await fetchImage(url)
     return mime
   })
 }

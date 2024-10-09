@@ -46,6 +46,10 @@ export const ClipboardListener = () => {
 
           setPastedImage(url)
           console.log('pastedURL:', url.href)
+
+          const imageHash = await electronApi.fetchImage(url.href)
+          console.log(imageHash)
+
           return
         } catch {
           handleOpenDialog('Invalid url image!')

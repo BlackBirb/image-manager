@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as mimedb from 'mime-db'
 
 export const debouncePromise = (fn: () => Promise<any>) => {
   let runningPromise = Promise.resolve()
@@ -23,3 +24,6 @@ export const debounce = (fn: () => any, delay = 200) => {
   debounced.cancel = () => clearTimeout(timeoutId)
   return debounced
 }
+
+export const getMimeExtension = (mimeType: string) =>
+  mimedb[mimeType].extensions ? mimedb[mimeType].extensions[0] : 'png' // have fun whatever reads this xd
