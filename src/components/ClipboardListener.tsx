@@ -30,6 +30,11 @@ export const ClipboardListener = () => {
           if (event.clipboardData.files[i].type.startsWith('image/')) {
             const pastedImage = event.clipboardData.files[i]
             setPastedImage(pastedImage)
+
+            // TODO: Yeah this is not place for it
+            const [commitImage] = saveImage(pastedImage)
+            const info = await commitImage()
+            console.log(info)
             break
           }
         }

@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { ensureDirectory, getMimeExtension } from './utils'
+import { ensureDirectory, getMimeExtension, getRandomString } from './utils'
 
 export const fetchURLMime = async (url: string) => {
   const response = await fetch(url, { method: 'HEAD' })
@@ -11,7 +11,7 @@ export const fetchURLMime = async (url: string) => {
 type PrefetchedImage = {
   data: ArrayBuffer
   mime: string
-  url: string
+  url: string | null
 }
 
 export type ImageSize = 'thumb' | 'full'
@@ -33,12 +33,35 @@ export const prefetchImage = async (url: string): Promise<TmpImgHandle> => {
     throw 'Failed to fetch: Invalid mime type'
   }
 
+  const handle: TmpImgHandle = getRandomString()
+
   tmpImages.set(
-    'randomHash',
+    handle,
     response.arrayBuffer().then((data) => ({ url, mime, data }) as PrefetchedImage),
   )
 
-  return 'randomHash'
+  return handle
+}
+
+export const cacheImage = (file: ArrayBuffer, mimeType: string): TmpImgHandle => {
+  if (!mimeType.startsWith('image/')) {
+    throw 'Failed to fetch: Invalid mime type'
+  }
+
+  const handle: TmpImgHandle = getRandomString()
+
+  tmpImages.set(
+    handle,
+    new Promise((resolve) =>
+      resolve({
+        data: file,
+        mime: mimeType,
+        url: null,
+      } as PrefetchedImage),
+    ),
+  )
+
+  return handle
 }
 
 // dir can be later changed to some global "current setting"?

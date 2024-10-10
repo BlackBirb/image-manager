@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
 import {
+  cacheImage,
   discardPrefetchedImage,
   fetchURLMime,
   prefetchImage,
@@ -44,9 +45,10 @@ export const createIPCApi = (windows: WindowsManager): void => {
     const imageHandle = await prefetchImage(url)
     return imageHandle
   })
-  // TODO: handles data from File
-  ipcMain.handle('cacheImage', async (_evn): Promise<TmpImgHandle> => {
-    return ''
+
+  ipcMain.handle('cacheImage', async (_evn, file: ArrayBuffer, mimeType: string): Promise<TmpImgHandle> => {
+    const imageHandle = cacheImage(file, mimeType)
+    return imageHandle
   })
 
   ipcMain.handle('commitImage', async (_evn, imageHandle: TmpImgHandle): Promise<SavedImageInfo> => {

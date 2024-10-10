@@ -19,7 +19,7 @@ export const saveImage = (img: URL | File): [() => Promise<SavedImageInfo>, () =
   if (img instanceof URL) {
     handlePromise = window.api.prefetchImage(img.href)
   } else {
-    handlePromise = window.api.cacheImage()
+    handlePromise = img.arrayBuffer().then((arrBuff) => window.api.cacheImage(arrBuff, img.type))
   }
 
   const commit = async () => {

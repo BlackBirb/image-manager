@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mkdir, stat } from 'fs/promises'
 import * as mimedb from 'mime-db'
+import crypto from 'node:crypto'
 
 export const debouncePromise = (fn: () => Promise<any>) => {
   let runningPromise = Promise.resolve()
@@ -43,3 +44,5 @@ export const ensureDirectory = async (path: string) => {
     }
   }
 }
+
+export const getRandomString = () => crypto.randomBytes(32).toString('base64url')

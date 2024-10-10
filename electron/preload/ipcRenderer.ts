@@ -7,7 +7,8 @@ export const close = () => ipcRenderer.send('closeWindow')
 
 export const getURLMime = (url: string): Promise<string> => ipcRenderer.invoke('getURLMime', url)
 export const prefetchImage = (url: string): Promise<TmpImgHandle> => ipcRenderer.invoke('prefetchImage', url)
-export const cacheImage = (): Promise<TmpImgHandle> => ipcRenderer.invoke('cacheImage')
+export const cacheImage = (file: ArrayBuffer, mimeType: string): Promise<TmpImgHandle> =>
+  ipcRenderer.invoke('cacheImage', file, mimeType)
 export const commitImage = (handle: TmpImgHandle): Promise<SavedImageInfo> => ipcRenderer.invoke('commitImage', handle)
 export const discardImage = (handle: TmpImgHandle): Promise<boolean> => ipcRenderer.invoke('discardImage', handle)
 
