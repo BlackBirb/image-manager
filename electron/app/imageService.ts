@@ -1,14 +1,31 @@
 import path from 'node:path'
-import { stat, mkdir, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { getMimeExtension } from './utils'
+import { ensureDirectory, getMimeExtension } from './utils'
 
 export const fetchURLMime = async (url: string) => {
   const response = await fetch(url, { method: 'HEAD' })
   return response.headers.get('content-type')
 }
 
-export const fetchImage = async (url: string) => {
+type PrefetchedImage = {
+  data: ArrayBuffer
+  mime: string
+  url: string
+}
+
+export type ImageSize = 'thumb' | 'full'
+
+export type TmpImgHandle = string
+
+export type SavedImageInfo = {
+  hash: string
+  ext: string
+}
+
+const tmpImages = new Map<string, Promise<PrefetchedImage>>()
+
+export const prefetchImage = async (url: string): Promise<TmpImgHandle> => {
   const response = await fetch(url)
   const mime = response.headers.get('content-type')
   if (!mime || !mime.startsWith('image/')) {
@@ -16,42 +33,41 @@ export const fetchImage = async (url: string) => {
     throw 'Failed to fetch: Invalid mime type'
   }
 
-  const data = await response.arrayBuffer()
+  tmpImages.set(
+    'randomHash',
+    response.arrayBuffer().then((data) => ({ url, mime, data }) as PrefetchedImage),
+  )
 
-  // TODO: Needs dir
-  return saveImage(data, mime, process.env.APP_ROOT)
+  return 'randomHash'
 }
 
 // dir can be later changed to some global "current setting"?
-// Should we check if file exists first? or does frontend with DB deal with that
-// tho how if it's called from fetchImage...
-// But if hash is the same we can overwrite it without worries, it's identical image right?
-export const saveImage = async (data: ArrayBuffer, mime: string, dir: string) => {
+export const savePrefetchedImage = async (handle: TmpImgHandle, dir: string): Promise<SavedImageInfo> => {
+  if (!tmpImages.has(handle)) throw 'Image not prefetched'
+
+  const prefetchedImage = await tmpImages.get(handle)
+  if (!prefetchedImage) throw 'This never happens but TS is silly'
+
+  const { data, mime } = prefetchedImage
+
   const hash = getImageHash(data)
-  const imagePath = getIamgePath(hash, mime, dir)
+  const dirPath = getImageDir(dir, hash)
+  const imagePath = getIamgePath(dir, hash, mime, 'full')
 
-  // ensure directory is there
-  const dirPath = imagePath
-    .split(/[\\\/]/)
-    .slice(0, -1)
-    .join('/')
-
-  try {
-    const stats = await stat(dirPath)
-    if (!stats.isDirectory()) throw `Somehow the hash directory is a file for: ${imagePath}`
-  } catch (err: any) {
-    if (err.code && err.code === 'ENOENT') {
-      await mkdir(dirPath, {
-        recursive: true,
-      })
-    } else {
-      throw err
-    }
-  }
+  await ensureDirectory(dirPath)
 
   writeFile(imagePath, Buffer.from(data))
 
-  return hash
+  // TODO: create a thumbnail
+
+  return { hash, ext: getMimeExtension(mime) }
+}
+
+export const discardPrefetchedImage = (handle: TmpImgHandle) => {
+  if (!tmpImages.has(handle)) throw 'Image not prefetched'
+
+  // should drop it from memory? There's no other references.
+  tmpImages.delete(handle)
 }
 
 export const getImageHash = (data: ArrayBuffer): string => {
@@ -62,5 +78,7 @@ export const getImageHash = (data: ArrayBuffer): string => {
   return hash.digest('hex')
 }
 
-export const getIamgePath = (imageHash: string, mime: string, dir: string) =>
-  path.join(dir, imageHash.slice(0, 2), imageHash.slice(2) + '.' + getMimeExtension(mime))
+export const getImageDir = (dir: string, imageHash: string) => path.join(dir, imageHash.slice(0, 2), imageHash.slice(2))
+
+export const getIamgePath = (dir: string, imageHash: string, mime: string, size: ImageSize) =>
+  path.join(getImageDir(dir, imageHash), size + '.' + getMimeExtension(mime))

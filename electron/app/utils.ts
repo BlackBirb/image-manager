@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { mkdir, stat } from 'fs/promises'
 import * as mimedb from 'mime-db'
 
 export const debouncePromise = (fn: () => Promise<any>) => {
@@ -27,3 +28,18 @@ export const debounce = (fn: () => any, delay = 200) => {
 
 export const getMimeExtension = (mimeType: string) =>
   mimedb[mimeType].extensions ? mimedb[mimeType].extensions[0] : 'png' // have fun whatever reads this xd
+
+export const ensureDirectory = async (path: string) => {
+  try {
+    const stats = await stat(path)
+    if (!stats.isDirectory()) throw `Somehow the hash directory is a file for: ${path}`
+  } catch (err: any) {
+    if (err.code && err.code === 'ENOENT') {
+      await mkdir(path, {
+        recursive: true,
+      })
+    } else {
+      throw err
+    }
+  }
+}

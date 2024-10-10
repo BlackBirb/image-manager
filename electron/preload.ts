@@ -9,3 +9,4 @@ const api = {
 contextBridge.exposeInMainWorld('api', api)
 
 export type ElectronAPI = typeof api
+export type { ImageSize, SavedImageInfo, TmpImgHandle } from './app/imageService'

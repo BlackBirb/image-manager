@@ -1,6 +1,14 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { fetchImage, fetchURLMime } from './imageService'
+import {
+  discardPrefetchedImage,
+  fetchURLMime,
+  prefetchImage,
+  SavedImageInfo,
+  savePrefetchedImage,
+  TmpImgHandle,
+} from './imageService'
+import path from 'node:path'
 
 export const createIPCApi = (windows: WindowsManager): void => {
   ipcMain.on('minimizeWindow', (evn) => {
@@ -32,10 +40,25 @@ export const createIPCApi = (windows: WindowsManager): void => {
     return mime
   })
 
-  ipcMain.handle('fetchImage', async (_evn, url) => {
-    const hash = await fetchImage(url)
-    console.log({ hash })
-    return hash
+  ipcMain.handle('prefetchImage', async (_evn, url: string): Promise<TmpImgHandle> => {
+    const imageHandle = await prefetchImage(url)
+    return imageHandle
+  })
+  // TODO: handles data from File
+  ipcMain.handle('cacheImage', async (_evn): Promise<TmpImgHandle> => {
+    return ''
+  })
+
+  ipcMain.handle('commitImage', async (_evn, imageHandle: TmpImgHandle): Promise<SavedImageInfo> => {
+    // TODO: Where to get dir from?
+    const dir = path.join(process.env.APP_ROOT, 'tmp-image-dump')
+    const imgInfo = await savePrefetchedImage(imageHandle, dir)
+    return imgInfo
+  })
+
+  ipcMain.handle('discardImage', async (_evn, imageHandle: TmpImgHandle): Promise<boolean> => {
+    await discardPrefetchedImage(imageHandle)
+    return true
   })
 }
 
