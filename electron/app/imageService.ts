@@ -75,13 +75,14 @@ export const savePrefetchedImage = async (handle: TmpImgHandle, dir: string): Pr
 
   const hash = getImageHash(data)
   const dirPath = getImageDir(dir, hash)
-  const imagePath = getIamgePath(dir, hash, mime, 'full')
 
   await ensureDirectory(dirPath)
 
-  writeFile(imagePath, Buffer.from(data))
+  const imgBuffer = Buffer.from(data)
+  writeFile(getIamgePath(dir, hash, mime, 'full'), imgBuffer)
 
-  // TODO: create a thumbnail
+  const thumbnailBuffer = await generateThumbnail(imgBuffer)
+  writeFile(getIamgePath(dir, hash, mime, 'thumb'), thumbnailBuffer)
 
   return { hash, ext: getMimeExtension(mime) }
 }
@@ -105,3 +106,14 @@ export const getImageDir = (dir: string, imageHash: string) => path.join(dir, im
 
 export const getIamgePath = (dir: string, imageHash: string, mime: string, size: ImageSize) =>
   path.join(getImageDir(dir, imageHash), size + '.' + getMimeExtension(mime))
+
+const generateThumbnail = (data: Buffer) => data
+// sharp(data)
+//   .resize({
+//     // TODO: Max dimensions
+//     width: 480,
+//     height: 640,
+//     // It'll fit to not crop anything
+//     fit: 'inside',
+//   })
+//   .toBuffer()
