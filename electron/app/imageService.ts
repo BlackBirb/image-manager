@@ -2,6 +2,7 @@ import path from 'node:path'
 import { writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { ensureDirectory, getMimeExtension, getRandomString } from './utils'
+import { nativeImage } from 'electron'
 
 export const fetchURLMime = async (url: string) => {
   const response = await fetch(url, { method: 'HEAD' })
@@ -82,7 +83,7 @@ export const savePrefetchedImage = async (handle: TmpImgHandle, dir: string): Pr
   writeFile(getIamgePath(dir, hash, mime, 'full'), imgBuffer)
 
   const thumbnailBuffer = await generateThumbnail(imgBuffer)
-  writeFile(getIamgePath(dir, hash, mime, 'thumb'), thumbnailBuffer)
+  writeFile(getIamgePath(dir, hash, 'image/png', 'thumb'), thumbnailBuffer)
 
   return { hash, ext: getMimeExtension(mime) }
 }
@@ -107,13 +108,11 @@ export const getImageDir = (dir: string, imageHash: string) => path.join(dir, im
 export const getIamgePath = (dir: string, imageHash: string, mime: string, size: ImageSize) =>
   path.join(getImageDir(dir, imageHash), size + '.' + getMimeExtension(mime))
 
-const generateThumbnail = (data: Buffer) => data
-// sharp(data)
-//   .resize({
-//     // TODO: Max dimensions
-//     width: 480,
-//     height: 640,
-//     // It'll fit to not crop anything
-//     fit: 'inside',
-//   })
-//   .toBuffer()
+const generateThumbnail = (data: Buffer) =>
+  nativeImage
+    .createFromBuffer(data)
+    .resize({
+      // TODO: What size of thumbnail?
+      width: 480,
+    })
+    .toPNG()
