@@ -1,8 +1,10 @@
-import path from 'node:path'
-import { writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { ensureDirectory, getMimeExtension, getRandomString } from './utils'
+import { writeFile } from 'node:fs/promises'
+import path from 'node:path'
+
 import { nativeImage } from 'electron'
+
+import { ensureDirectory, getMimeExtension, getRandomString } from './utils'
 
 export const fetchURLMime = async (url: string) => {
   const response = await fetch(url, { method: 'HEAD' })

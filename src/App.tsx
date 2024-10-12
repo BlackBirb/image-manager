@@ -7,6 +7,7 @@ import '@fontsource/roboto/700.css'
 import { Root } from 'src/components/Root'
 import { State } from 'src/state/State'
 import './main.css'
+import { InitApp } from 'src/state/InitApp'
 
 const darkTheme = createTheme({
   palette: {
@@ -19,7 +20,9 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <State>
-        <Root />
+        <InitApp>
+          <Root />
+        </InitApp>
       </State>
     </ThemeProvider>
   )

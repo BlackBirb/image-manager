@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mkdir, stat } from 'fs/promises'
-import * as mimedb from 'mime-db'
 import crypto from 'node:crypto'
+
+import * as mimedb from 'mime-db'
 
 export const debouncePromise = (fn: () => Promise<any>) => {
   let runningPromise = Promise.resolve()

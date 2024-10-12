@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { BrowserWindow, ipcMain } from 'electron'
 
 import {
@@ -9,7 +11,6 @@ import {
   savePrefetchedImage,
   TmpImgHandle,
 } from './imageService'
-import path from 'node:path'
 
 export const createIPCApi = (windows: WindowsManager): void => {
   ipcMain.on('minimizeWindow', (evn) => {

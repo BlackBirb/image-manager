@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron'
+
 import { SavedImageInfo, TmpImgHandle } from '../preload'
 
 export const minimize = () => ipcRenderer.send('minimizeWindow')

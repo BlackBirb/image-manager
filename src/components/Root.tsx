@@ -1,12 +1,12 @@
+import { Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { ImageGallery } from 'src/components/ImageGallery'
 import { Search } from 'src/components/Search'
 import { TitleBar } from 'src/components/TitleBar'
+import { UserPreferences } from 'src/components/UserPreferences'
 
 import { ClipboardListener } from './ClipboardListener'
 import { ImagePreview } from './ImagePreview'
-import { Stack } from '@mui/material'
-import { UserPreferences } from 'src/components/UserPreferences'
-import { ImageGallery } from 'src/components/ImageGallery'
 
 const GridLayout = styled('div', {
   name: 'GridLayout',
