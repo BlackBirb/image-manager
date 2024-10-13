@@ -29,6 +29,8 @@ export type SavedImageInfo = {
 const tmpImages = new Map<string, Promise<PrefetchedImage>>()
 
 export const prefetchImage = async (url: string): Promise<TmpImgHandle> => {
+  throw 'Test throw, remove me in electron/app/imageService:32'
+
   const response = await fetch(url)
   const mime = response.headers.get('content-type')
   if (!mime || !mime.startsWith('image/')) {

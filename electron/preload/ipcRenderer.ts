@@ -1,4 +1,4 @@
-import { dialog, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 
 import { SavedImageInfo, TmpImgHandle } from '../preload'
 
@@ -28,3 +28,12 @@ export const onWindowMaximize = (cb: (maximized: boolean) => void) => {
 }
 
 export const choosePath = (): Promise<Electron.OpenDialogReturnValue> => ipcRenderer.invoke('openPathChooser')
+
+export const onNodeError = (cb: (error: string) => void) => {
+  const extractError = (_, err: string) => cb(err)
+  ipcRenderer.on('error', extractError)
+
+  return () => {
+    ipcRenderer.removeListener('error', extractError)
+  }
+}

@@ -42,9 +42,13 @@ export const createIPCApi = (windows: WindowsManager): void => {
     return mime
   })
 
-  ipcMain.handle('prefetchImage', async (_evn, url: string): Promise<TmpImgHandle> => {
-    const imageHandle = await prefetchImage(url)
-    return imageHandle
+  ipcMain.handle('prefetchImage', async (evn, url: string): Promise<TmpImgHandle> => {
+    try {
+      const imageHandle = await prefetchImage(url)
+      return imageHandle
+    } catch (err: string) {
+      evn.sender.send('error', err)
+    }
   })
 
   ipcMain.handle('cacheImage', async (_evn, file: ArrayBuffer, mimeType: string): Promise<TmpImgHandle> => {
