@@ -1,6 +1,6 @@
 import path from 'node:path'
 
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 
 import {
   cacheImage,
@@ -62,6 +62,12 @@ export const createIPCApi = (windows: WindowsManager): void => {
   ipcMain.handle('discardImage', async (_evn, imageHandle: TmpImgHandle): Promise<boolean> => {
     await discardPrefetchedImage(imageHandle)
     return true
+  })
+
+  ipcMain.handle('openPathChooser', async (_evn): Promise<Electron.OpenDialogReturnValue> => {
+    return await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    })
   })
 }
 

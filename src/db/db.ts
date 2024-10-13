@@ -2,10 +2,10 @@
 import DexieBase, { Table } from 'dexie'
 
 type UserPreferences = {
-  id: number
+  id?: number
   name: string
-  defaultMaterial: ContentMaterialType
-  galleryPath: string
+  defaultContentType: ContentType
+  folderPath: string
   pagination: number
 }
 
@@ -18,7 +18,7 @@ const userPreferencesSchema = {
 }
 
 type Tag = {
-  id: number
+  id?: number
   name: string
   createdAt: number
   updatedAt: number
@@ -32,12 +32,12 @@ const tagsSchema = {
   tags: '++id, name',
 }
 
-export type ContentMaterialType = 'sfw' | 'nsfw' | 'questionable'
+export type ContentType = 'sfw' | 'nsfw' | 'questionable'
 
 type Content = {
   id: string
   tags: Tag[]
-  material: ContentMaterialType
+  contentType: ContentType
   sourceUrl: string
   additionalUrls: string[]
   type: 'image' | 'video' | 'gif'
@@ -50,7 +50,7 @@ type ContentTable = {
 }
 
 const contentSchema = {
-  content: 'id, *tags, material, createdAt, updatedAt',
+  content: 'id, *tags, contentType, createdAt, updatedAt',
 }
 
 type DexieTables = UserPreferencesTable & TagTable & ContentTable

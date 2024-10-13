@@ -1,26 +1,27 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from '@mui/material'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { PropsWithChildren, useCallback } from 'react'
+import { useCallback } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { ContentMaterialType, db } from 'src/db/db'
+import { ContentType, db } from 'src/db/db'
+import { useElectronApi } from 'src/hooks/useElectronApi'
 import * as yup from 'yup'
 
 const validationSchema = yup
   .object({
     folderPath: yup.string().required(),
-    defaultContentType: yup.string<ContentMaterialType>().required(),
+    defaultContentType: yup.string<ContentType>().required(),
     pagination: yup.number().required(),
   })
   .required()
 
 type FormDataType = {
   folderPath: string
-  defaultContentType: ContentMaterialType
+  defaultContentType: ContentType
   pagination: number
 }
 
 export const InitForm = () => {
+  const electronAPI = useElectronApi()
   const { control, handleSubmit, setValue } = useForm<FormDataType>({
     defaultValues: {
       folderPath: '',
@@ -30,13 +31,20 @@ export const InitForm = () => {
     resolver: yupResolver(validationSchema),
   })
 
-  const handleChooseAPath = useCallback(() => {
-    // electron open OS path choose thingy.
-    setValue('folderPath', 'Some path')
-  }, [])
+  const handleChooseAPath = useCallback(async () => {
+    const dialogPath = await electronAPI.choosePath()
+    if (dialogPath?.filePaths?.length) {
+      setValue('folderPath', dialogPath?.filePaths[0])
+    }
+  }, [electronAPI])
 
   const onSubmit: SubmitHandler<FormDataType> = (data) => {
-    console.info(data)
+    db.user.add({
+      name: 'user',
+      folderPath: data.folderPath,
+      pagination: data.pagination,
+      defaultContentType: data.defaultContentType,
+    })
   }
 
   return (
@@ -85,6 +93,9 @@ export const InitForm = () => {
               )
             }}
           />
+          <Button variant="contained" type="submit">
+            Save
+          </Button>
         </Stack>
       </form>
     </Stack>
