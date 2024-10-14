@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { writeFile } from 'node:fs/promises'
+import { stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { nativeImage } from 'electron'
@@ -27,6 +27,25 @@ export type SavedImageInfo = {
 }
 
 const tmpImages = new Map<string, Promise<PrefetchedImage>>()
+
+// After all, why shouldn't I make a global string
+let outputPath: string | null = null
+
+export const setOutputPath = async (newPath: string) => {
+  if (!path.isAbsolute(newPath)) throw 'Output path must be absolute'
+  try {
+    const stats = await stat(newPath)
+    if (!stats.isDirectory()) throw `Output path must be a directory`
+
+    outputPath = newPath
+  } catch {
+    throw 'Output path does not exists'
+  }
+}
+const getOutputPath = () => {
+  if (outputPath === null) throw 'Output path is not set.'
+  return outputPath
+}
 
 export const prefetchImage = async (url: string): Promise<TmpImgHandle> => {
   throw 'Test throw, remove me in electron/app/imageService:32'
@@ -69,14 +88,14 @@ export const cacheImage = (file: ArrayBuffer, mimeType: string): TmpImgHandle =>
   return handle
 }
 
-// dir can be later changed to some global "current setting"?
-export const savePrefetchedImage = async (handle: TmpImgHandle, dir: string): Promise<SavedImageInfo> => {
+export const savePrefetchedImage = async (handle: TmpImgHandle): Promise<SavedImageInfo> => {
   if (!tmpImages.has(handle)) throw 'Image not prefetched'
 
   const prefetchedImage = await tmpImages.get(handle)
   if (!prefetchedImage) throw 'This never happens but TS is silly'
 
   const { data, mime } = prefetchedImage
+  const dir = getOutputPath()
 
   const hash = getImageHash(data)
   const dirPath = getImageDir(dir, hash)

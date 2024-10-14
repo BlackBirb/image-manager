@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 
 import {
@@ -9,6 +7,7 @@ import {
   prefetchImage,
   SavedImageInfo,
   savePrefetchedImage,
+  setOutputPath,
   TmpImgHandle,
 } from './imageService'
 
@@ -57,9 +56,7 @@ export const createIPCApi = (windows: WindowsManager): void => {
   })
 
   ipcMain.handle('commitImage', async (_evn, imageHandle: TmpImgHandle): Promise<SavedImageInfo> => {
-    // TODO: Where to get dir from?
-    const dir = path.join(process.env.APP_ROOT, 'tmp-image-dump')
-    const imgInfo = await savePrefetchedImage(imageHandle, dir)
+    const imgInfo = await savePrefetchedImage(imageHandle)
     return imgInfo
   })
 
@@ -72,6 +69,14 @@ export const createIPCApi = (windows: WindowsManager): void => {
     return await dialog.showOpenDialog({
       properties: ['openDirectory'],
     })
+  })
+
+  ipcMain.on('setImageStorePath', async (evn, imgPath: string): Promise<void> => {
+    try {
+      await setOutputPath(imgPath)
+    } catch (err) {
+      evn.sender.send('error', err)
+    }
   })
 }
 
