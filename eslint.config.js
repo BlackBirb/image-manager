@@ -26,6 +26,7 @@ const eslintConfig = [
       '.out/*',
       '!.prettierrc.js',
       'dist/*',
+      'dist-electron/*',
       'build/*',
       'vite.config.mjs',
       'vite.config.mjs.timestamp-*.mjs',

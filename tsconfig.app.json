@@ -21,6 +21,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["dist-electron"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"]
 }
