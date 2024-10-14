@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import { useElectronApi } from 'src/hooks/useElectronApi'
 import { explodingObject } from 'src/utils/explodingObject'
-import { removeItemFromArray } from 'src/utils/utils'
 
 type UIErrorSeverity = 'warning' | 'error'
 
@@ -29,6 +29,8 @@ export const ErrorStateContextProvider = (props: PropsWithChildren<Record<any, u
   const { children } = props
   const [errors, setErrors] = useState<UIError[]>([])
 
+  const electronApi = useElectronApi()
+
   // should it be useCallback or useMemo?
   const throwError = useCallback((message: string, severity: UIErrorSeverity = 'error') => {
     setErrors((oldErrors) => [...oldErrors, { message, severity }])
@@ -47,9 +49,8 @@ export const ErrorStateContextProvider = (props: PropsWithChildren<Record<any, u
     setErrors((oldErrors) => oldErrors.filter((e) => e !== error))
   }, [])
 
-  // i don't like window.api here but adding it to useElectron API is just useless wrapper
   useEffect(() =>
-    window.api.onNodeError((err) => {
+    electronApi.onNodeError((err) => {
       throwError(err)
     }),
   )
