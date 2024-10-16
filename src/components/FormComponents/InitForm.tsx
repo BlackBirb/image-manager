@@ -34,11 +34,15 @@ export const InitForm = () => {
   const handleChooseAPath = useCallback(async () => {
     const dialogPath = await electronAPI.choosePath()
     if (dialogPath?.filePaths?.length) {
-      setValue('folderPath', dialogPath?.filePaths[0])
+      const path = dialogPath?.filePaths[0]
+      setValue('folderPath', path)
     }
-  }, [electronAPI])
+  }, [])
 
-  const onSubmit: SubmitHandler<FormDataType> = (data) => {
+  const onSubmit: SubmitHandler<FormDataType> = async (data) => {
+    if (!(await electronAPI.setImageStorePath(data.folderPath))) {
+      return false
+    }
     db.user.add({
       name: 'user',
       folderPath: data.folderPath,

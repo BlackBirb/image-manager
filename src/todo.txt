@@ -1,11 +1,14 @@
+Folder selected by user is in renderer, need to pass it to `electronAPI.setImageStorePath` somewhere on startup...
+Also it returns bool to indicate if the folder still exists, need to respect that just in case
+
 Write a DB delete function.
 Get the userPreferences and show them in the user settings panel
 Update the user preferences.
 Add tags in the db from the imageAdd panel
 remove tags?
-Add the first image: 
+Add the first image:
   Generate the ID from the MP5 cache of the original file.
-  Generate the thumbnail. 
+  Generate the thumbnail.
   Save them into the folder structure we discussed.
   Fill the form enough so we can save the DB data.
 

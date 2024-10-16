@@ -71,11 +71,13 @@ export const createIPCApi = (windows: WindowsManager): void => {
     })
   })
 
-  ipcMain.on('setImageStorePath', async (evn, imgPath: string): Promise<void> => {
+  ipcMain.handle('setImageStorePath', async (evn, imgPath: string): Promise<boolean> => {
     try {
       await setOutputPath(imgPath)
+      return true
     } catch (err) {
       evn.sender.send('error', err)
+      return false
     }
   })
 }

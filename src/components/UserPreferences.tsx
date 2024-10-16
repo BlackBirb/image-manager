@@ -15,11 +15,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useState } from 'react'
+import { ContentType, db } from 'src/db/db'
+import { getUserPreferences } from 'src/db/useDb'
 
 export const UserPreferences = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+
+  const preferences = useLiveQuery(() => getUserPreferences(), [])
 
   const onToggleOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl((prev) => {
@@ -32,14 +37,22 @@ export const UserPreferences = () => {
   }, [])
 
   const handleOnDefaultImageExplicitility = (event: SelectChangeEvent) => {
-    // setAge(event.target.value as string);
+    const val = event.target.value as ContentType
+    db.user.update(preferences.id, {
+      defaultContentType: val,
+    })
   }
   const handleOnChangePagination = (event: SelectChangeEvent) => {
-    // setAge(event.target.value as string);
+    db.user.update(preferences.id, {
+      pagination: event.target.value,
+    })
   }
   const handleOnDesignChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     // setAge(event.target.value as string);
   }
+
+  if (!preferences) return "Something's very wrong"
+
   return (
     <Box>
       <IconButton onClick={onToggleOpen}>
@@ -59,7 +72,11 @@ export const UserPreferences = () => {
           <Stack spacing={2}>
             <FormControl fullWidth>
               <InputLabel id="default-image-explicitylity">Default Image Explicitility</InputLabel>
-              <Select labelId="default-image-explicitylity" value="nsfw" onChange={handleOnDefaultImageExplicitility}>
+              <Select
+                labelId="default-image-explicitylity"
+                value={preferences.defaultContentType}
+                onChange={handleOnDefaultImageExplicitility}
+              >
                 <MenuItem value="nsfw">NSFW</MenuItem>
                 <MenuItem value="sfw">SFW</MenuItem>
                 <MenuItem value="questionable">Questionable</MenuItem>
@@ -69,13 +86,17 @@ export const UserPreferences = () => {
             <Typography>Grid spacing ? </Typography>
             <FormControl fullWidth>
               <InputLabel id="pagination">Pagination</InputLabel>
-              <Select labelId="pagination" value="50" onChange={handleOnChangePagination}>
+              <Select
+                labelId="pagination"
+                value={preferences.pagination.toString()}
+                onChange={handleOnChangePagination}
+              >
                 <MenuItem value="20">20</MenuItem>
                 <MenuItem value="50">50</MenuItem>
                 <MenuItem value="100">100</MenuItem>
               </Select>
             </FormControl>
-            <TextField label="Folder Path" disabled>
+            <TextField label="Folder Path" value={preferences.folderPath} disabled>
               The chosen path where the images are stored in the beginning of the app.
             </TextField>
             <FormControlLabel

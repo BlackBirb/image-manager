@@ -28,7 +28,7 @@ export const onWindowMaximize = (cb: (maximized: boolean) => void) => {
 }
 
 export const choosePath = (): Promise<Electron.OpenDialogReturnValue> => ipcRenderer.invoke('openPathChooser')
-export const setImageStorePath = (path: string): void => ipcRenderer.send('setImageStorePath', path)
+export const setImageStorePath = (path: string): Promise<boolean> => ipcRenderer.invoke('setImageStorePath', path)
 
 export const onNodeError = (cb: (error: string) => void) => {
   const extractError = (_, err: string) => cb(err)
