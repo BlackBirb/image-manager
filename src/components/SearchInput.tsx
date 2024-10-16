@@ -15,12 +15,14 @@ type SearchInputProps = {
   onChange: (value: string) => void
   onClick?: () => void
   onEnter?: () => void
+  onFocus?: () => void
+  onBlur?: () => void
   onArrowUpDown?: (direction: 'ArrowUp' | 'ArrowDown') => void
   withIcon?: boolean
 }
 
 export const SearchInput = forwardRef((props: SearchInputProps, ref: React.ForwardedRef<HTMLDivElement | null>) => {
-  const { value, placeholder, onChange, onClick, onEnter, onArrowUpDown, withIcon } = props
+  const { value, placeholder, onChange, onClick, onEnter, onFocus, onBlur, onArrowUpDown, withIcon } = props
 
   const handleOnChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,7 +38,6 @@ export const SearchInput = forwardRef((props: SearchInputProps, ref: React.Forwa
         onEnter()
       }
 
-      console.log('event.key: ', event.key)
       if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         if (!onArrowUpDown) return
         onArrowUpDown(event.key)
@@ -52,6 +53,8 @@ export const SearchInput = forwardRef((props: SearchInputProps, ref: React.Forwa
         inputProps={{ 'aria-label': placeholder }}
         value={value}
         onChange={handleOnChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
         onKeyDown={handleKeyDown}
       />
       {withIcon && (

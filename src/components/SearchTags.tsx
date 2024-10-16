@@ -1,18 +1,18 @@
 import { Chip, Stack } from '@mui/material'
 import { useCallback } from 'react'
-import { removeItemFromArray } from 'src/utils/utils'
+import { Tag } from 'src/db/db'
 
 type SearchTagsProps = {
-  tags: string[]
-  setTags: (newTags: string[]) => void
+  tags: Tag[]
+  setTags: (newTags: Tag[]) => void
 }
 
 export const SearchTags = (props: SearchTagsProps) => {
   const { tags, setTags } = props
 
   const handleRemoveTag = useCallback(
-    (deleteTag: string) => {
-      setTags(removeItemFromArray(tags, deleteTag))
+    (deleteTag: Tag) => {
+      setTags(tags.filter((t) => t.id !== deleteTag.id))
     },
     [tags],
   )
@@ -20,7 +20,7 @@ export const SearchTags = (props: SearchTagsProps) => {
   return (
     <Stack direction="row" spacing={1}>
       {tags?.map((tag) => {
-        return <Chip key={tag} label={tag} onDelete={() => handleRemoveTag(tag)} />
+        return <Chip key={tag.id} label={tag.name} onDelete={() => handleRemoveTag(tag)} />
       })}
     </Stack>
   )

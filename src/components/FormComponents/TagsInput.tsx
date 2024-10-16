@@ -1,10 +1,11 @@
 import { Stack } from '@mui/material'
 import { SearchTags } from 'src/components/SearchTags'
 import { SearchTagsBox } from 'src/components/SearchTagsBox'
+import { Tag } from 'src/db/db'
 
 type TagsInputProps = {
-  tags: string[]
-  setTags: (newTags: string[]) => void
+  tags: Tag[]
+  setTags: (newTags: Tag[]) => void
 }
 
 export const TagsInput = (props: TagsInputProps) => {

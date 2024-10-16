@@ -2,8 +2,6 @@ Folder selected by user is in renderer, need to pass it to `electronAPI.setImage
 Also it returns bool to indicate if the folder still exists, need to respect that just in case
 
 Write a DB delete function.
-Get the userPreferences and show them in the user settings panel
-Update the user preferences.
 Add tags in the db from the imageAdd panel
 remove tags?
 Add the first image:

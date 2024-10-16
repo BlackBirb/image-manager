@@ -9,11 +9,11 @@ export const InitApp = (props: PropsWithChildren<Record<never, unknown>>) => {
 
   const isDBInit = useLiveQuery(async () => {
     const user = await getUserPreferences()
-    console.log('user: ', user)
+    console.info('[DB] user: ', user)
     return user?.name === 'user'
   })
 
-  console.log('isDBInit: ', isDBInit)
+  console.info('[DB] isDBInit: ', isDBInit)
 
   if (!isDBInit) return <InitForm />
 

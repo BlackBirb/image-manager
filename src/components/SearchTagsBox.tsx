@@ -1,24 +1,22 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { db, Tag } from 'src/db/db'
+import { getTagAtIndex, searchTags } from 'src/db/useDb'
 
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
 import { SearchInput } from './SearchInput'
 
 type SearchTagsBoxProps = {
-  tags: string[]
-  setTags: (newTags: string[]) => void
+  tags: Tag[]
+  setTags: (newTags: Tag[]) => void
   allowNew?: boolean
 }
 
-function removeItemFromArray(arr: string[], item: string) {
-  return arr.filter((t) => t !== item)
-}
-
-// Will come from db.
-const mockTags = ['dragon', 'cat', 'dog']
-
 export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   const { tags, setTags, allowNew } = props
+
+  const [isFocused, setIsFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   // This will probably go to the DB handler who will do the filtering
   // and return the list of tags
@@ -26,17 +24,15 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [listIndex, setListIndex] = useState(-1)
 
-  // Probably will be filtered somewhere else. TBD
-  const filteredTags = useMemo(() => {
-    return mockTags.filter((t) => !tags.includes(t))
-  }, [tags])
+  // Can't really make it a memo, cuz it kinda is but eslint complains.
+  const filteredTags = useLiveQuery(() => searchTags(searchText), [searchText]) || []
 
   const handleOnTagClick = useCallback(
-    (clickedTag: string) => {
+    (clickedTag: Tag) => {
       setSearchText('')
 
       if (tags.includes(clickedTag)) {
-        return setTags(removeItemFromArray(tags, clickedTag))
+        return setTags(tags.filter((t) => t.id !== clickedTag.id))
       }
       const newTags = [...tags]
       newTags.push(clickedTag)
@@ -56,16 +52,26 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   // I will want to make this when we arrow down, to tabIndex select the
   // options in the list. I can probably use the stupid mui autocomplete
   // but i hate it, so will think of something DIY.
-  const handleEnter = useCallback(() => {
+  const handleEnter = useCallback(async () => {
     // We assume they're sorted by best match
     if (listIndex > -1) {
       handleOnTagClick(filteredTags[listIndex])
       return
     }
-
+    // Make a better UI to add tags ?
     if (allowNew) {
-      handleOnTagClick(searchText)
-      return
+      const dateNow = Date.now()
+      const newTagAtIndex = await db.tags.add({
+        name: searchText,
+        createdAt: dateNow,
+        updatedAt: dateNow,
+      })
+      if (newTagAtIndex) {
+        const newTag = await getTagAtIndex(newTagAtIndex)
+        if (newTag) {
+          handleOnTagClick(newTag)
+        }
+      }
     }
   }, [allowNew, listIndex, searchText, filteredTags, handleOnTagClick])
 
@@ -96,7 +102,7 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
     setListIndex(-1)
   }, [searchText])
 
-  const open = searchText.length > 0 && Boolean(anchorEl)
+  const open = isFocused && Boolean(anchorEl)
   const id = open ? 'search-popper' : undefined
 
   return (
@@ -108,6 +114,8 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
         onClick={handleOpenList}
         onEnter={handleEnter}
         onArrowUpDown={handleOnArrowUpDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         ref={searchWrapperRef}
         withIcon
       />
@@ -134,14 +142,14 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
                 <SearchList dense>
                   {filteredTags.map((tag, index) => {
                     return (
-                      <SearchListItem key={tag}>
+                      <SearchListItem key={tag.id}>
                         <ListItemButton
                           selected={listIndex === index}
                           onClick={() => {
                             handleOnTagClick(tag)
                           }}
                         >
-                          <ListItemText primary={tag} />
+                          <ListItemText primary={tag.name} />
                         </ListItemButton>
                       </SearchListItem>
                     )

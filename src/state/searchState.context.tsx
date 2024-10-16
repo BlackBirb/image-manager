@@ -1,12 +1,13 @@
 import { createContext, PropsWithChildren, useMemo, useState } from 'react'
+import { Tag } from 'src/db/db'
 import { explodingObject } from 'src/utils/explodingObject'
 
 type SearchStateContextType = {
   data: {
-    searchedTags: string[]
+    searchedTags: Tag[]
   }
   api: {
-    setSearchedTags: React.Dispatch<React.SetStateAction<string[]>>
+    setSearchedTags: React.Dispatch<React.SetStateAction<Tag[]>>
   }
 }
 
@@ -16,7 +17,7 @@ export const SearchStateContext = createContext<SearchStateContextType>(
 
 export const SearchStateContextProvider = (props: PropsWithChildren<Record<any, unknown>>) => {
   const { children } = props
-  const [searchedTags, setSearchedTags] = useState<string[]>([])
+  const [searchedTags, setSearchedTags] = useState<Tag[]>([])
 
   const contextData = useMemo(
     () => ({

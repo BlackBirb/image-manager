@@ -34,7 +34,7 @@ export const ClipboardListener = () => {
             // TODO: Yeah this is not place for it
             const [commitImage] = saveImage(pastedImage)
             const info = await commitImage()
-            console.log(info)
+            console.info('[Clipboard] commit Image', info)
             break
           }
         }
@@ -50,11 +50,11 @@ export const ClipboardListener = () => {
           if (!mime.startsWith('image/')) throw 'Invalid resource mime type'
 
           setPastedImage(url)
-          console.log('pastedURL:', url.href)
+          console.info('[Clipboard] pastedURL:', url.href)
 
           const [commitImage] = saveImage(url)
           const info = await commitImage()
-          console.log(info)
+          console.info('[Clipboard] commit Image', info)
 
           return
         } catch {
@@ -62,7 +62,7 @@ export const ClipboardListener = () => {
         }
       }
       handleOpenDialog('No file or image URL found!')
-      console.warn('No files or iamge URL found on clipboard')
+      console.warn('No files or image URL found on clipboard')
     }
     window.addEventListener('paste', onPaste)
     return () => {

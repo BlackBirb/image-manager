@@ -17,7 +17,7 @@ const userPreferencesSchema = {
   user: '++id, name',
 }
 
-type Tag = {
+export type Tag = {
   id?: number
   name: string
   createdAt: number
