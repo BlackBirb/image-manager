@@ -17,9 +17,13 @@ const userPreferencesSchema = {
   user: '++id, name',
 }
 
+// In theory only tag() util function should return this
+// so it screams if you forget it
+export type TagName = string & { __brand: 'TagName' }
+
 export type Tag = {
   id?: number
-  name: string
+  name: TagName
   createdAt: number
   updatedAt: number
 }

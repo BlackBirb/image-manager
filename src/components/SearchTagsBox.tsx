@@ -1,8 +1,9 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { db, Tag } from 'src/db/db'
+import { db, Tag, TagName } from 'src/db/db'
 import { getTagAtIndex, searchTags } from 'src/db/useDb'
+import { tag } from 'src/utils/utils'
 
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
 import { SearchInput } from './SearchInput'
@@ -20,11 +21,14 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   // This will probably go to the DB handler who will do the filtering
   // and return the list of tags
-  const [searchText, setSearchText] = useState<string>('')
+  const [searchText, setSearchTextState] = useState<TagName>('' as TagName)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [listIndex, setListIndex] = useState(-1)
 
+  const setSearchText = (str: string) => setSearchTextState(tag(str))
+
   // Can't really make it a memo, cuz it kinda is but eslint complains.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const filteredTags = useLiveQuery(() => searchTags(searchText), [searchText]) || []
 
   const handleOnTagClick = useCallback(
