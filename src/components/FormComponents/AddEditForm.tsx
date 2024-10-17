@@ -3,6 +3,7 @@ import { Box, Button, IconButton, Stack, Switch, TextField, Typography } from '@
 import cloneDeep from 'lodash/cloneDeep'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { TagsInput } from 'src/components/FormComponents/TagsInput'
+import { db, Tag } from 'src/db/db'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { v4 as uuid } from 'uuid'
 
@@ -14,7 +15,8 @@ type AdditionalImageUrlType = {
 type AddEditFormType = {
   id: string
   sfw: boolean
-  tags: string[]
+  // Typescript didn't actually notice it was setting Tag[] into a string[]..
+  tags: Tag[]
   sourceUrl: string
   additionalImageUrls: AdditionalImageUrlType[]
   type: 'image' | 'video' | 'gif' // Should come from mimetype ?
@@ -37,7 +39,7 @@ export const AddEditForm = () => {
 
   const [formData, setFormData] = useState<AddEditFormType>(defaultNewFormData)
 
-  const handleSetTags = useCallback((newTags: string[]) => {
+  const handleSetTags = useCallback((newTags: Tag[]) => {
     setFormData((oldFormData) => {
       const newFormData = cloneDeep(oldFormData) as AddEditFormType
       newFormData.tags = newTags
@@ -96,9 +98,27 @@ export const AddEditForm = () => {
     })
   }, [])
 
-  const handleOnSave = () => {
+  const handleOnSave = async () => {
     // Call the DB, save/update the data
-    setPastedImage(null)
+
+    // add non-existing tags
+    const newTags: { [key: string]: Tag } = Object.fromEntries(formData.tags.map((tag) => [tag.name, tag]))
+    const existingTags = await db.tags.where('name').anyOf(Object.keys(newTags)).toArray()
+
+    for (const tag of existingTags) {
+      if (!tag.id) throw "Somehow database's tag had no id, this is just for typescript"
+
+      delete newTags[tag.name]
+    }
+
+    console.log(
+      existingTags,
+      Object.values(newTags),
+      formData.tags.map((tag) => tag.name),
+    )
+
+    // db.tags.bulkAdd(Object.values(newTags))
+    // setPastedImage(null)
   }
 
   useEffect(() => {

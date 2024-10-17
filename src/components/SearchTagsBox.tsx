@@ -35,8 +35,9 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
     (clickedTag: Tag) => {
       setSearchText('')
 
+      /// TODO This includes creates problems
       if (tags.includes(clickedTag)) {
-        return setTags(tags.filter((t) => t.id !== clickedTag.id))
+        return setTags(tags.filter((t) => t.id !== clickedTag.id && t.name !== clickedTag.name))
       }
       const newTags = [...tags]
       newTags.push(clickedTag)
@@ -62,20 +63,24 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
       handleOnTagClick(filteredTags[listIndex])
       return
     }
+
+    if (searchText.length < 1) return
+
+    if (filteredTags[0] && filteredTags[0].name === searchText) {
+      console.log('Setting tag', filteredTags[0])
+      return handleOnTagClick(filteredTags[0])
+    }
+
     // Make a better UI to add tags ?
     if (allowNew) {
       const dateNow = Date.now()
-      const newTagAtIndex = await db.tags.add({
+      const newTag = {
         name: searchText,
         createdAt: dateNow,
         updatedAt: dateNow,
-      })
-      if (newTagAtIndex) {
-        const newTag = await getTagAtIndex(newTagAtIndex)
-        if (newTag) {
-          handleOnTagClick(newTag)
-        }
-      }
+      } as Tag
+
+      handleOnTagClick(newTag)
     }
   }, [allowNew, listIndex, searchText, filteredTags, handleOnTagClick])
 

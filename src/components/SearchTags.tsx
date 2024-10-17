@@ -12,7 +12,7 @@ export const SearchTags = (props: SearchTagsProps) => {
 
   const handleRemoveTag = useCallback(
     (deleteTag: Tag) => {
-      setTags(tags.filter((t) => t.id !== deleteTag.id))
+      setTags(tags.filter((t) => t.id !== deleteTag.id || t.name !== deleteTag.name))
     },
     [tags],
   )
@@ -20,7 +20,8 @@ export const SearchTags = (props: SearchTagsProps) => {
   return (
     <Stack direction="row" spacing={1}>
       {tags?.map((tag) => {
-        return <Chip key={tag.id} label={tag.name} onDelete={() => handleRemoveTag(tag)} />
+        // new tags might not have an ID!
+        return <Chip key={tag.id || tag.name} label={tag.name} onDelete={() => handleRemoveTag(tag)} />
       })}
     </Stack>
   )
