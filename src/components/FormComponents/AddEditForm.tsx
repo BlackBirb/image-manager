@@ -106,19 +106,11 @@ export const AddEditForm = () => {
     const existingTags = await db.tags.where('name').anyOf(Object.keys(newTags)).toArray()
 
     for (const tag of existingTags) {
-      if (!tag.id) throw "Somehow database's tag had no id, this is just for typescript"
-
       delete newTags[tag.name]
     }
 
-    console.log(
-      existingTags,
-      Object.values(newTags),
-      formData.tags.map((tag) => tag.name),
-    )
-
-    // db.tags.bulkAdd(Object.values(newTags))
-    // setPastedImage(null)
+    db.tags.bulkAdd(Object.values(newTags))
+    setPastedImage(null)
   }
 
   useEffect(() => {

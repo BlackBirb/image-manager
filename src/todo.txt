@@ -1,6 +1,6 @@
 Folder selected by user is in renderer, need to pass it to `electronAPI.setImageStorePath` somewhere on startup...
 Also it returns bool to indicate if the folder still exists, need to respect that just in case
-
+I don't like tags having ID's, or at least using them.
 Write a DB delete function.
 Add tags in the db from the imageAdd panel
 remove tags?

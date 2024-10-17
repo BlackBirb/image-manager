@@ -1,8 +1,8 @@
 import { Backdrop, Box, Fade, ListItemButton, ListItemText, Popper, Stack } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { db, Tag, TagName } from 'src/db/db'
-import { getTagAtIndex, searchTags } from 'src/db/useDb'
+import { Tag, TagName } from 'src/db/db'
+import { searchTags } from 'src/db/useDb'
 import { tag } from 'src/utils/utils'
 
 import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
@@ -36,7 +36,7 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
       setSearchText('')
 
       /// TODO This includes creates problems
-      if (tags.includes(clickedTag)) {
+      if (tags.some((t) => t.id === clickedTag.id || t.name === clickedTag.name)) {
         return setTags(tags.filter((t) => t.id !== clickedTag.id && t.name !== clickedTag.name))
       }
       const newTags = [...tags]
@@ -54,9 +54,6 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
     setAnchorEl(null)
   }, [])
 
-  // I will want to make this when we arrow down, to tabIndex select the
-  // options in the list. I can probably use the stupid mui autocomplete
-  // but i hate it, so will think of something DIY.
   const handleEnter = useCallback(async () => {
     // We assume they're sorted by best match
     if (listIndex > -1) {
@@ -64,17 +61,18 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
       return
     }
 
+    // avoid adding empty "custom" tags
     if (searchText.length < 1) return
 
-    if (filteredTags[0] && filteredTags[0].name === searchText) {
-      console.log('Setting tag', filteredTags[0])
+    // enter can select top result if it matches or new ones aren't allowed
+    if ((filteredTags[0] && filteredTags[0].name === searchText) || !allowNew) {
       return handleOnTagClick(filteredTags[0])
     }
 
-    // Make a better UI to add tags ?
     if (allowNew) {
       const dateNow = Date.now()
       const newTag = {
+        id: dateNow,
         name: searchText,
         createdAt: dateNow,
         updatedAt: dateNow,
