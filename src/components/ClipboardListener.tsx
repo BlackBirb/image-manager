@@ -47,7 +47,8 @@ export const ClipboardListener = () => {
           const url = new URL(textData)
           // we can fetch only headers to make sure it's an image mime type
           const mime = await electronApi.getURLMime(url.href)
-          if (!mime.startsWith('image/')) throw 'Invalid resource mime type'
+          if (!mime) throw 'Failed to fetch mime type'
+          if (mime.startsWith('image/')) throw 'Invalid resource mime type'
 
           setPastedImage(url)
           console.info('[Clipboard] pastedURL:', url.href)
@@ -58,7 +59,8 @@ export const ClipboardListener = () => {
 
           return
         } catch {
-          handleOpenDialog('Invalid url image!')
+          // General error handler will catch this
+          // handleOpenDialog('Invalid url image!')
         }
       }
       handleOpenDialog('No file or image URL found!')

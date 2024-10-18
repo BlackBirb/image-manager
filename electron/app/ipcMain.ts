@@ -36,33 +36,54 @@ export const createIPCApi = (windows: WindowsManager): void => {
     win.close()
   })
 
-  ipcMain.handle('getURLMime', async (_evn, url) => {
-    const mime = await fetchURLMime(url)
-    return mime
-  })
-
-  ipcMain.handle('prefetchImage', async (evn, url: string): Promise<TmpImgHandle> => {
+  ipcMain.handle('getURLMime', async (evn, url) => {
     try {
-      const imageHandle = await prefetchImage(url)
-      return imageHandle
-    } catch (err: string) {
+      const mime = await fetchURLMime(url)
+      return mime
+    } catch (err) {
       evn.sender.send('error', err)
+      return null
     }
   })
 
-  ipcMain.handle('cacheImage', async (_evn, file: ArrayBuffer, mimeType: string): Promise<TmpImgHandle> => {
-    const imageHandle = cacheImage(file, mimeType)
-    return imageHandle
+  ipcMain.handle('prefetchImage', async (evn, url: string): Promise<TmpImgHandle | null> => {
+    try {
+      const imageHandle = await prefetchImage(url)
+      return imageHandle
+    } catch (err) {
+      evn.sender.send('error', err)
+      return null
+    }
   })
 
-  ipcMain.handle('commitImage', async (_evn, imageHandle: TmpImgHandle): Promise<SavedImageInfo> => {
-    const imgInfo = await savePrefetchedImage(imageHandle)
-    return imgInfo
+  ipcMain.handle('cacheImage', async (evn, file: ArrayBuffer, mimeType: string): Promise<TmpImgHandle | null> => {
+    try {
+      const imageHandle = cacheImage(file, mimeType)
+      return imageHandle
+    } catch (err) {
+      evn.sender.send('error', err)
+      return null
+    }
   })
 
-  ipcMain.handle('discardImage', async (_evn, imageHandle: TmpImgHandle): Promise<boolean> => {
-    await discardPrefetchedImage(imageHandle)
-    return true
+  ipcMain.handle('commitImage', async (evn, imageHandle: TmpImgHandle): Promise<SavedImageInfo | false> => {
+    try {
+      const imgInfo = await savePrefetchedImage(imageHandle)
+      return imgInfo
+    } catch (err) {
+      evn.sender.send('error', err)
+      return false
+    }
+  })
+
+  ipcMain.handle('discardImage', async (evn, imageHandle: TmpImgHandle): Promise<boolean> => {
+    try {
+      await discardPrefetchedImage(imageHandle)
+      return true
+    } catch (err) {
+      evn.sender.send('error', err)
+      return false
+    }
   })
 
   ipcMain.handle('openPathChooser', async (_evn): Promise<Electron.OpenDialogReturnValue> => {

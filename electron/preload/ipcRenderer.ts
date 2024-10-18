@@ -6,11 +6,12 @@ export const minimize = () => ipcRenderer.send('minimizeWindow')
 export const toggleMaximize = () => ipcRenderer.invoke('toggleWindowMaximize')
 export const close = () => ipcRenderer.send('closeWindow')
 
-export const getURLMime = (url: string): Promise<string> => ipcRenderer.invoke('getURLMime', url)
-export const prefetchImage = (url: string): Promise<TmpImgHandle> => ipcRenderer.invoke('prefetchImage', url)
+export const getURLMime = (url: string): Promise<string | null> => ipcRenderer.invoke('getURLMime', url)
+export const prefetchImage = (url: string): Promise<TmpImgHandle | null> => ipcRenderer.invoke('prefetchImage', url)
 export const cacheImage = (file: ArrayBuffer, mimeType: string): Promise<TmpImgHandle> =>
   ipcRenderer.invoke('cacheImage', file, mimeType)
-export const commitImage = (handle: TmpImgHandle): Promise<SavedImageInfo> => ipcRenderer.invoke('commitImage', handle)
+export const commitImage = (handle: TmpImgHandle): Promise<SavedImageInfo | false> =>
+  ipcRenderer.invoke('commitImage', handle)
 export const discardImage = (handle: TmpImgHandle): Promise<boolean> => ipcRenderer.invoke('discardImage', handle)
 
 export const onWindowMaximize = (cb: (maximized: boolean) => void) => {

@@ -14,8 +14,8 @@ export const useWindowMaximize = (): [boolean | null, () => Promise<void>] => {
   return [isMaximized, toggleMaximize]
 }
 
-export const saveImage = (img: URL | File): [() => Promise<SavedImageInfo>, () => Promise<boolean>] => {
-  let handlePromise: Promise<IElectronAPI.TmpImgHandle> | null = null
+export const saveImage = (img: URL | File): [() => Promise<SavedImageInfo | false>, () => Promise<boolean>] => {
+  let handlePromise: Promise<IElectronAPI.TmpImgHandle | null> | null = null
   if (img instanceof URL) {
     handlePromise = window.api.prefetchImage(img.href)
   } else {
@@ -24,11 +24,14 @@ export const saveImage = (img: URL | File): [() => Promise<SavedImageInfo>, () =
 
   const commit = async () => {
     const imageHandle = await handlePromise
+    // it could return null from commitImage anyways
+    if (!imageHandle) return false
     return window.api.commitImage(imageHandle)
   }
 
   const discard = async () => {
     const imageHandle = await handlePromise
+    if (!imageHandle) return false
     return window.api.discardImage(imageHandle)
   }
 
