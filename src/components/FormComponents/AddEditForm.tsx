@@ -4,6 +4,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { TagsInput } from 'src/components/FormComponents/TagsInput'
 import { db, Tag } from 'src/db/db'
+import { saveImage } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { v4 as uuid } from 'uuid'
 
@@ -100,6 +101,13 @@ export const AddEditForm = () => {
 
   const handleOnSave = async () => {
     // Call the DB, save/update the data
+    if (!pastedImage) {
+      console.error('No image data to save!')
+      return
+    }
+    const [commitImage] = saveImage(pastedImage)
+    const info = await commitImage()
+    console.info('[Clipboard] commit Image', info)
 
     // add non-existing tags
     const newTags: { [key: string]: Tag } = Object.fromEntries(formData.tags.map((tag) => [tag.name, tag]))
@@ -110,6 +118,7 @@ export const AddEditForm = () => {
     }
 
     db.tags.bulkAdd(Object.values(newTags))
+
     setPastedImage(null)
   }
 

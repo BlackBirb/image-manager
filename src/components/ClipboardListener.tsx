@@ -5,6 +5,7 @@ import { ClipboardStateContext } from 'src/state/clipboardState.context'
 
 export const ClipboardListener = () => {
   const {
+    data: { pastedImage },
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
 
@@ -24,17 +25,16 @@ export const ClipboardListener = () => {
 
   useLayoutEffect(() => {
     const onPaste = async (event: ClipboardEvent) => {
+      if (pastedImage) {
+        // The add image modal is open!
+        return
+      }
       event.stopPropagation()
       if (event.clipboardData?.files.length) {
         for (let i = 0; i <= event.clipboardData.files.length; i++) {
           if (event.clipboardData.files[i].type.startsWith('image/')) {
-            const pastedImage = event.clipboardData.files[i]
-            setPastedImage(pastedImage)
-
-            // TODO: Yeah this is not place for it
-            const [commitImage] = saveImage(pastedImage)
-            const info = await commitImage()
-            console.info('[Clipboard] commit Image', info)
+            const newFile = event.clipboardData.files[i]
+            setPastedImage(newFile)
             break
           }
         }
@@ -71,7 +71,7 @@ export const ClipboardListener = () => {
     return () => {
       window.removeEventListener('paste', onPaste)
     }
-  }, [handleOpenDialog, setPastedImage])
+  }, [pastedImage, handleOpenDialog, setPastedImage])
 
   return (
     <Dialog open={openDialog}>

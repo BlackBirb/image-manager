@@ -1,17 +1,30 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { PropsWithChildren } from 'react'
+import { setImageStorePath } from 'electron/preload/ipcRenderer'
+import { PropsWithChildren, useEffect, useMemo } from 'react'
 import { InitForm } from 'src/components/FormComponents/InitForm'
-import { db } from 'src/db/db'
 import { getUserPreferences } from 'src/db/useDb'
 
 export const InitApp = (props: PropsWithChildren<Record<never, unknown>>) => {
   const { children } = props
 
-  const isDBInit = useLiveQuery(async () => {
-    const user = await getUserPreferences()
-    console.info('[DB] user: ', user)
+  const user = useLiveQuery(getUserPreferences)
+
+  const isDBInit = useMemo(() => {
     return user?.name === 'user'
-  })
+  }, [user])
+
+  useEffect(() => {
+    const setImagePromise = async (path: string) => {
+      console.log(path)
+      const pathSaved = await setImageStorePath(path)
+      console.log('pathSaved: ', pathSaved)
+    }
+    console.log('isDBInit: ', isDBInit)
+    if (isDBInit && user?.folderPath) {
+      console.log('user?.folderPath: ', user?.folderPath)
+      setImagePromise(user?.folderPath)
+    }
+  }, [user, isDBInit])
 
   console.info('[DB] isDBInit: ', isDBInit)
 
