@@ -1,13 +1,24 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { setImageStorePath } from 'electron/preload/ipcRenderer'
-import { PropsWithChildren, useEffect, useMemo } from 'react'
+import { PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 import { InitForm } from 'src/components/FormComponents/InitForm'
 import { getUserPreferences } from 'src/db/useDb'
+import { useElectronApi } from 'src/hooks/useElectronApi'
+import { ErrorStateContext } from 'src/state/errorState.context'
 
 export const InitApp = (props: PropsWithChildren<Record<never, unknown>>) => {
   const { children } = props
 
-  const user = useLiveQuery(getUserPreferences)
+  const {
+    api: { throwError },
+  } = useContext(ErrorStateContext)
+
+  const { setImageStorePath } = useElectronApi()
+
+  const user = useLiveQuery(getUserPreferences, [])
+
+  useEffect(() => {
+    console.log('user: ', user)
+  }, [user])
 
   const isDBInit = useMemo(() => {
     return user?.name === 'user'
@@ -15,18 +26,19 @@ export const InitApp = (props: PropsWithChildren<Record<never, unknown>>) => {
 
   useEffect(() => {
     const setImagePromise = async (path: string) => {
-      console.log(path)
       const pathSaved = await setImageStorePath(path)
-      console.log('pathSaved: ', pathSaved)
+      if (!pathSaved) {
+        throwError('Failed to set image path on load!')
+      }
     }
-    console.log('isDBInit: ', isDBInit)
     if (isDBInit && user?.folderPath) {
-      console.log('user?.folderPath: ', user?.folderPath)
       setImagePromise(user?.folderPath)
     }
   }, [user, isDBInit])
 
-  console.info('[DB] isDBInit: ', isDBInit)
+  useEffect(() => {
+    console.info('[DB] isDBInit: ', isDBInit)
+  }, [isDBInit])
 
   if (!isDBInit) return <InitForm />
 

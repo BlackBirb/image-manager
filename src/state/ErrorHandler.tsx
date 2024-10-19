@@ -1,5 +1,5 @@
 import { Button, Stack } from '@mui/material'
-import { useContext, PropsWithChildren, useCallback } from 'react'
+import { useContext, PropsWithChildren, useCallback, useMemo } from 'react'
 import { ErrorStateContext } from 'src/state/errorState.context'
 
 // Or should this be in components?
@@ -14,15 +14,19 @@ export const ErrorHandler = (props: PropsWithChildren<Record<never, unknown>>) =
     clearErrors()
   }, [clearErrors])
 
-  if (errors.length < 1) return children
-
-  // make it ✨pretty✨ please
-  return (
-    <Stack>
+  const renderedError = useMemo(() => {
+    return (
       <Stack>
         🔥{errors.map((err) => err.message).join('🔥')}🔥
         <Button onClick={handleButtonClick}>Clear</Button>
       </Stack>
+    )
+  }, [errors, handleButtonClick])
+
+  // make it ✨pretty✨ please
+  return (
+    <Stack>
+      {renderedError}
       <Stack>{children}</Stack>
     </Stack>
   )

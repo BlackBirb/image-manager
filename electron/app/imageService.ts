@@ -48,8 +48,6 @@ const getOutputPath = () => {
 }
 
 export const prefetchImage = async (url: string): Promise<TmpImgHandle> => {
-  throw 'Test throw, remove me in electron/app/imageService:32'
-
   const response = await fetch(url)
   const mime = response.headers.get('content-type')
   if (!mime || !mime.startsWith('image/')) {
@@ -103,10 +101,10 @@ export const savePrefetchedImage = async (handle: TmpImgHandle): Promise<SavedIm
   await ensureDirectory(dirPath)
 
   const imgBuffer = Buffer.from(data)
-  writeFile(getIamgePath(dir, hash, mime, 'full'), imgBuffer)
+  writeFile(getImagePath(dir, hash, mime, false), imgBuffer)
 
   const thumbnailBuffer = await generateThumbnail(imgBuffer)
-  writeFile(getIamgePath(dir, hash, 'image/png', 'thumb'), thumbnailBuffer)
+  writeFile(getImagePath(dir, hash, 'image/png', true), thumbnailBuffer)
 
   return { hash, ext: getMimeExtension(mime) }
 }
@@ -128,8 +126,12 @@ export const getImageHash = (data: ArrayBuffer): string => {
 
 export const getImageDir = (dir: string, imageHash: string) => path.join(dir, imageHash.slice(0, 2), imageHash.slice(2))
 
-export const getIamgePath = (dir: string, imageHash: string, mime: string, size: ImageSize) =>
-  path.join(getImageDir(dir, imageHash), size + '.' + getMimeExtension(mime))
+export const getImagePath = (dir: string, imageHash: string, mime: string, thumbnail: boolean) => {
+  return path.join(
+    getImageDir(dir, imageHash),
+    `${imageHash}${thumbnail ? '_thumbnail' : ''}.${getMimeExtension(mime)}`,
+  )
+}
 
 const generateThumbnail = (data: Buffer) =>
   nativeImage
