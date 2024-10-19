@@ -17,6 +17,7 @@ import {
 } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useState } from 'react'
+import { DeleteDBModal } from 'src/components/DeleteDBModal'
 import { ContentType, db } from 'src/db/db'
 import { getUserPreferences } from 'src/db/useDb'
 
@@ -38,17 +39,22 @@ export const UserPreferences = () => {
 
   const handleOnDefaultImageExplicitility = (event: SelectChangeEvent) => {
     const val = event.target.value as ContentType
-    db.user.update(preferences.id, {
+    db.user.update(preferences?.id, {
       defaultContentType: val,
     })
   }
   const handleOnChangePagination = (event: SelectChangeEvent) => {
-    db.user.update(preferences.id, {
-      pagination: event.target.value,
-    })
+    try {
+      const valueAsNumber: number = parseInt(event.target.value)
+      db.user.update(preferences?.id, {
+        pagination: valueAsNumber,
+      })
+    } catch (err) {
+      console.error('err: ', err)
+    }
   }
   const handleOnDesignChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    // setAge(event.target.value as string);
+    // TODO: I might make it look completely different. (Probably not as lazy)
   }
 
   if (!preferences) return "Something's very wrong"
@@ -103,6 +109,7 @@ export const UserPreferences = () => {
               control={<Switch onChange={handleOnDesignChange} value={false} />}
               label="Exiting design"
             />
+            <DeleteDBModal />
           </Stack>
         </Paper>
       </Popover>

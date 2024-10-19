@@ -22,7 +22,6 @@ const userPreferencesSchema = {
 export type TagName = string & { __brand: 'TagName' }
 
 export type Tag = {
-  id?: number
   name: TagName
   createdAt: number
   updatedAt: number
@@ -67,7 +66,25 @@ const schema = Object.assign({}, userPreferencesSchema, tagsSchema, contentSchem
 
 db.version(1).stores(schema)
 
-export { db }
+// Nukes the DB. Need to restart the app as this also closes the connection
+// to the DB. Deletes EVERYTHING!!!
+// Need to remove this once we deploy it for "commercial" use.
+const DELETE_DB = () => {
+  db.delete()
+    .then(() => {
+      console.info('Database deleted successfully')
+      console.info('You need to restart the app!')
+    })
+    .catch((err) => {
+      console.error('Failed to delete database!')
+      console.error('err: ', err)
+    })
+    .finally(() => {
+      // Do what should be done next...
+    })
+}
+
+export { db, DELETE_DB }
 
 // Syntax For Indexes
 // keyPath		                Means that keyPath is indexed
