@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 import { InitForm } from 'src/components/FormComponents/InitForm'
-import { getUserPreferences } from 'src/db/useDb'
+import { getAllImages, getUserPreferences } from 'src/db/useDb'
 import { useElectronApi } from 'src/hooks/useElectronApi'
 import { ErrorStateContext } from 'src/state/errorState.context'
 
@@ -15,6 +15,8 @@ export const InitApp = (props: PropsWithChildren<Record<never, unknown>>) => {
   const { setImageStorePath } = useElectronApi()
 
   const user = useLiveQuery(getUserPreferences, [])
+  const content = useLiveQuery(getAllImages)
+  console.log('content: ', content)
 
   useEffect(() => {
     console.log('user: ', user)

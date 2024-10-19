@@ -2,21 +2,21 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from '@mui/material'
 import { useCallback } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { ContentType, db } from 'src/db/db'
+import { ContentExplicityType, ContentType, db } from 'src/db/db'
 import { useElectronApi } from 'src/hooks/useElectronApi'
 import * as yup from 'yup'
 
 const validationSchema = yup
   .object({
     folderPath: yup.string().required(),
-    defaultContentType: yup.string<ContentType>().required(),
+    defaultContentType: yup.string<ContentExplicityType>().required(),
     pagination: yup.number().required(),
   })
   .required()
 
 type FormDataType = {
   folderPath: string
-  defaultContentType: ContentType
+  defaultContentType: ContentExplicityType
   pagination: number
 }
 

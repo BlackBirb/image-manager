@@ -1,10 +1,13 @@
 // db.ts
 import DexieBase, { Table } from 'dexie'
 
+export type ContentExplicityType = 'sfw' | 'nsfw' | 'questionable'
+export type ContentType = 'image' | 'video' | 'gif'
+
 type UserPreferences = {
   id?: number
   name: string
-  defaultContentType: ContentType
+  defaultContentType: ContentExplicityType
   folderPath: string
   pagination: number
 }
@@ -35,15 +38,13 @@ const tagsSchema = {
   tags: '++id, name',
 }
 
-export type ContentType = 'sfw' | 'nsfw' | 'questionable'
-
 type Content = {
   id: string
-  tags: Tag[]
+  tags: string[]
   contentType: ContentType
   sourceUrl: string
   additionalUrls: string[]
-  type: 'image' | 'video' | 'gif'
+  type: ContentType
   createdAt: number
   updatedAt: number
 }

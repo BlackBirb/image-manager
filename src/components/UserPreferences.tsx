@@ -18,7 +18,7 @@ import {
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useState } from 'react'
 import { DeleteDBModal } from 'src/components/DeleteDBModal'
-import { ContentType, db } from 'src/db/db'
+import { ContentExplicityType, db } from 'src/db/db'
 import { getUserPreferences } from 'src/db/useDb'
 
 export const UserPreferences = () => {
@@ -38,7 +38,7 @@ export const UserPreferences = () => {
   }, [])
 
   const handleOnDefaultImageExplicitility = (event: SelectChangeEvent) => {
-    const val = event.target.value as ContentType
+    const val = event.target.value as ContentExplicityType
     db.user.update(preferences?.id, {
       defaultContentType: val,
     })

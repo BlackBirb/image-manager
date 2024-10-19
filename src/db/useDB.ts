@@ -14,3 +14,4 @@ export const searchTags = async (text: string) => {
   }
   return getAllTags()
 }
+export const getAllImages = () => db.content.toArray()

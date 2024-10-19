@@ -4,7 +4,9 @@ import { Tag } from 'src/db/db'
 
 type SearchTagsProps = {
   tags: Tag[]
-  setTags: (newTags: Tag[]) => void
+  setTags?: (newTags: Tag[]) => void
+  addTag?: (newTags: Tag[]) => void
+  deleteTag?: (index: number) => void
 }
 
 export const SearchTags = (props: SearchTagsProps) => {
@@ -12,7 +14,9 @@ export const SearchTags = (props: SearchTagsProps) => {
 
   const handleRemoveTag = useCallback(
     (deleteTag: Tag) => {
-      setTags(tags.filter((t) => t.id !== deleteTag.id || t.name !== deleteTag.name))
+      if (setTags) {
+        setTags(tags.filter((t) => t.name !== deleteTag.name))
+      }
     },
     [tags],
   )

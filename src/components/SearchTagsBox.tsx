@@ -10,7 +10,9 @@ import { SearchInput } from './SearchInput'
 
 type SearchTagsBoxProps = {
   tags: Tag[]
-  setTags: (newTags: Tag[]) => void
+  setTags?: (newTags: Tag[]) => void
+  addTag?: (newTags: Tag[]) => void
+  deleteTag?: (index: number) => void
   allowNew?: boolean
 }
 
@@ -33,11 +35,12 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
 
   const handleOnTagClick = useCallback(
     (clickedTag: Tag) => {
+      if (!setTags) return
       setSearchText('')
 
       /// TODO This includes creates problems
-      if (tags.some((t) => t.id === clickedTag.id || t.name === clickedTag.name)) {
-        return setTags(tags.filter((t) => t.id !== clickedTag.id && t.name !== clickedTag.name))
+      if (tags.some((t) => t.name === clickedTag.name)) {
+        return setTags(tags.filter((t) => t.name !== clickedTag.name))
       }
       const newTags = [...tags]
       newTags.push(clickedTag)
@@ -147,16 +150,16 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
                 }}
               >
                 <SearchList dense>
-                  {filteredTags.map((tag, index) => {
+                  {filteredTags.map((itemTag, index) => {
                     return (
-                      <SearchListItem key={tag.id}>
+                      <SearchListItem key={itemTag.name}>
                         <ListItemButton
                           selected={listIndex === index}
                           onClick={() => {
-                            handleOnTagClick(tag)
+                            handleOnTagClick(itemTag)
                           }}
                         >
-                          <ListItemText primary={tag.name} />
+                          <ListItemText primary={itemTag.name} />
                         </ListItemButton>
                       </SearchListItem>
                     )

@@ -1,31 +1,70 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { Add as AddIcon, Close as CloseIcon } from '@mui/icons-material'
-import { Box, Button, IconButton, Stack, Switch, TextField, Typography } from '@mui/material'
-import cloneDeep from 'lodash/cloneDeep'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import {
+  Box,
+  Button,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { useContext, useEffect, useState } from 'react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { TagsInput } from 'src/components/FormComponents/TagsInput'
-import { db, Tag } from 'src/db/db'
+import { ContentExplicityType, ContentType, db, Tag } from 'src/db/db'
 import { saveImage } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { v4 as uuid } from 'uuid'
+import * as yup from 'yup'
 
-type AdditionalImageUrlType = {
-  id: string
+type FormAdditionalImageUrlType = {
   additionalImageUrl: string
 }
 
+type FormTagsType = {
+  tag: string
+}
+
+const validationSchema = yup
+  .object({
+    id: yup.string().required(),
+    contentType: yup.string<ContentExplicityType>().required(),
+    // Typescript didn't actually notice it was setting Tag[] into a string[]..
+    tags: yup
+      .array(
+        yup.object({
+          tag: yup.string().required(),
+        }),
+      )
+      .required(),
+    sourceUrl: yup.string().required(),
+    additionalImageUrls: yup
+      .array(
+        yup.object({
+          additionalImageUrl: yup.string().required(),
+        }),
+      )
+      .required(),
+    type: yup.string<ContentType>().required(),
+  })
+  .required()
+
 type AddEditFormType = {
   id: string
-  sfw: boolean
-  // Typescript didn't actually notice it was setting Tag[] into a string[]..
-  tags: Tag[]
+  contentType: ContentExplicityType
+  tags: FormTagsType[]
   sourceUrl: string
-  additionalImageUrls: AdditionalImageUrlType[]
-  type: 'image' | 'video' | 'gif' // Should come from mimetype ?
+  additionalImageUrls: FormAdditionalImageUrlType[]
+  type: ContentType
 }
 
 const defaultNewFormData: AddEditFormType = {
   id: uuid(),
-  sfw: true,
+  contentType: 'nsfw', // TODO fetch user preferences
   tags: [],
   sourceUrl: '',
   additionalImageUrls: [],
@@ -38,68 +77,19 @@ export const AddEditForm = () => {
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
 
-  const [formData, setFormData] = useState<AddEditFormType>(defaultNewFormData)
+  const { control, handleSubmit, setValue, watch } = useForm<AddEditFormType>({
+    defaultValues: defaultNewFormData,
+    resolver: yupResolver(validationSchema),
+  })
 
-  const handleSetTags = useCallback((newTags: Tag[]) => {
-    setFormData((oldFormData) => {
-      const newFormData = cloneDeep(oldFormData) as AddEditFormType
-      newFormData.tags = newTags
-      return newFormData
-    })
-  }, [])
+  const watchType = watch('type')
 
-  const handleSFWChange = useCallback((_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    setFormData((oldFormData) => {
-      const newFormData = cloneDeep(oldFormData) as AddEditFormType
-      newFormData.sfw = checked
-      return newFormData
-    })
-  }, [])
+  const additionalImageUrlsFieldArray = useFieldArray<AddEditFormType>({
+    name: 'additionalImageUrls',
+    control,
+  })
 
-  const handleOnSourceUrlChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((oldFormData) => {
-      const newFormData = cloneDeep(oldFormData) as AddEditFormType
-      newFormData.sourceUrl = event.target.value
-      return newFormData
-    })
-  }, [])
-
-  const onAddAdditionalUrl = useCallback(() => {
-    setFormData((oldFormData) => {
-      const newFormData = cloneDeep(oldFormData) as AddEditFormType
-      newFormData.additionalImageUrls.push({
-        id: uuid(),
-        additionalImageUrl: '',
-      })
-      return newFormData
-    })
-  }, [])
-
-  const onRemoveAdditionalUrl = useCallback((id: string) => {
-    setFormData((oldFormData) => {
-      const newFormData = cloneDeep(oldFormData) as AddEditFormType
-      newFormData.additionalImageUrls = newFormData.additionalImageUrls.filter((item) => item.id !== id)
-      return newFormData
-    })
-  }, [])
-
-  const onAdditionalUrlChange = useCallback((newValue: string, id: string) => {
-    setFormData((oldFormData) => {
-      const newFormData = cloneDeep(oldFormData) as AddEditFormType
-      newFormData.additionalImageUrls = newFormData.additionalImageUrls.map((item) => {
-        if (item.id === id) {
-          return {
-            id,
-            additionalImageUrl: newValue,
-          }
-        }
-        return item
-      })
-      return newFormData
-    })
-  }, [])
-
-  const handleOnSave = async () => {
+  const onSubmit = async () => {
     // Call the DB, save/update the data
     if (!pastedImage) {
       console.error('No image data to save!')
@@ -119,59 +109,81 @@ export const AddEditForm = () => {
 
     db.tags.bulkAdd(Object.values(newTags))
 
+    // db.content.add({
+    //   additionalUrls:
+    // })
+
     setPastedImage(null)
   }
 
   useEffect(() => {
-    if (pastedImage instanceof URL)
-      setFormData((oldFormData) => {
-        const newFormData = cloneDeep(oldFormData) as AddEditFormType
-        newFormData.sourceUrl = pastedImage.href
-        return newFormData
-      })
+    if (pastedImage instanceof URL) setValue('sourceUrl', pastedImage.href)
   }, [pastedImage])
 
   return (
-    <Stack spacing={2} height="100%" justifyContent="space-between">
-      <Stack spacing={2}>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Typography>SFW</Typography>
-          <Switch value={formData.sfw} onChange={handleSFWChange} />
-          <Typography>NSFW</Typography>
-        </Stack>
-        <TextField label="Source URL" value={formData.sourceUrl} onChange={handleOnSourceUrlChange} size="small" />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing={2} height="100%" justifyContent="space-between">
         <Stack spacing={2}>
-          <Typography>Additional urls</Typography>
-          {formData.additionalImageUrls.map((item, index) => {
-            const { additionalImageUrl, id } = item
-            return (
-              <Stack key={id} direction="row" alignItems="center" spacing={2}>
-                <TextField
-                  label={`Additional url ${index}`}
-                  value={additionalImageUrl}
-                  onChange={(event) => {
-                    onAdditionalUrlChange(event.target.value, id)
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <Controller
+              name="contentType"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <FormControl fullWidth>
+                    <InputLabel id="default-image-explicity">Default Image Explicity</InputLabel>
+                    <Select labelId="default-image-explicity" {...field}>
+                      <MenuItem value="nsfw">NSFW</MenuItem>
+                      <MenuItem value="sfw">SFW</MenuItem>
+                      <MenuItem value="questionable">Questionable</MenuItem>
+                    </Select>
+                  </FormControl>
+                )
+              }}
+            />
+          </Stack>
+          <Controller
+            name="sourceUrl"
+            control={control}
+            render={({ field }) => {
+              return <TextField {...field} label="Source URL" size="small" />
+            }}
+          />
+          <Stack spacing={2}>
+            <Typography>Additional urls</Typography>
+            {additionalImageUrlsFieldArray.fields.map((item, index) => {
+              return (
+                <Controller
+                  key={item.id}
+                  name="contentType"
+                  control={control}
+                  render={({ field }) => {
+                    return (
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <TextField {...field} label={`Additional url ${index}`} size="small" />
+                        <Box>
+                          <IconButton onClick={() => additionalImageUrlsFieldArray.remove(index)}>
+                            <CloseIcon />
+                          </IconButton>
+                        </Box>
+                      </Stack>
+                    )
                   }}
-                  size="small"
                 />
-                <Box>
-                  <IconButton onClick={() => onRemoveAdditionalUrl(id)}>
-                    <CloseIcon />
-                  </IconButton>
-                </Box>
-              </Stack>
-            )
-          })}
-          <Box>
-            <Button onClick={onAddAdditionalUrl} startIcon={<AddIcon />}>
-              Add new additional url
-            </Button>
-          </Box>
-          <Typography>Mime type: {formData.type}</Typography>
+              )
+            })}
+            <Box>
+              <Button onClick={() => additionalImageUrlsFieldArray.append('')} startIcon={<AddIcon />}>
+                Add new additional url
+              </Button>
+            </Box>
+            <Typography>Mime type: {watchType}</Typography>
+          </Stack>
+          {/* TODO: make the tags */}
+          <TagsInput tags={formData.tags} setTags={() => {}} addTag={} />
         </Stack>
-        <TagsInput tags={formData.tags} setTags={handleSetTags} />
+        <Button type="submit">Save</Button>
       </Stack>
-      <Button onClick={handleOnSave}>Save</Button>
-    </Stack>
+    </form>
   )
 }
