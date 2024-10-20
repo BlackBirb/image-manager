@@ -10,14 +10,13 @@ import { SearchInput } from './SearchInput'
 
 type SearchTagsBoxProps = {
   tags: Tag[]
-  setTags?: (newTags: Tag[]) => void
-  addTag?: (newTags: Tag[]) => void
-  deleteTag?: (index: number) => void
+  addTag: (tag: Tag) => void
+  deleteTag: (index: number) => void
   allowNew?: boolean
 }
 
 export const SearchTagsBox = (props: SearchTagsBoxProps) => {
-  const { tags, setTags, allowNew } = props
+  const { tags, addTag, deleteTag, allowNew } = props
 
   const [isFocused, setIsFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -35,18 +34,12 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
 
   const handleOnTagClick = useCallback(
     (clickedTag: Tag) => {
-      if (!setTags) return
-      setSearchText('')
-
-      /// TODO This includes creates problems
       if (tags.some((t) => t.name === clickedTag.name)) {
-        return setTags(tags.filter((t) => t.name !== clickedTag.name))
+        return deleteTag(tags.findIndex((t) => t.name === clickedTag.name))
       }
-      const newTags = [...tags]
-      newTags.push(clickedTag)
-      return setTags(newTags)
+      addTag(clickedTag)
     },
-    [tags, setTags],
+    [tags, addTag, deleteTag],
   )
 
   const handleOpenList = useCallback(() => {

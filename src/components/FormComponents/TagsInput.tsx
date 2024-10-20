@@ -5,8 +5,8 @@ import { Tag } from 'src/db/db'
 
 type TagsInputProps = {
   tags: Tag[]
-  addTag?: (newTags: Tag[]) => void
-  deleteTag?: (index: number) => void
+  addTag: (newTag: Tag) => void
+  deleteTag: (index: number) => void
 }
 
 export const TagsInput = (props: TagsInputProps) => {

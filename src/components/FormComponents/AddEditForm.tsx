@@ -179,8 +179,8 @@ export const AddEditForm = () => {
             </Box>
             <Typography>Mime type: {watchType}</Typography>
           </Stack>
-          {/* TODO: make the tags */}
-          <TagsInput tags={formData.tags} setTags={() => {}} addTag={} />
+          {/* TODO: make the tags and add/delete functions */}
+          <TagsInput tags={formData.tags} addTag={() => {}} deleteTag={() => {}} />
         </Stack>
         <Button type="submit">Save</Button>
       </Stack>
