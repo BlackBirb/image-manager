@@ -3,6 +3,7 @@ import { Add as AddIcon, Close as CloseIcon } from '@mui/icons-material'
 import {
   Box,
   Button,
+  Chip,
   FormControl,
   IconButton,
   InputLabel,
@@ -12,12 +13,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { TagsInput } from 'src/components/FormComponents/TagsInput'
+import { useContext, useEffect } from 'react'
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag } from 'src/db/db'
 import { saveImage } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
+import { ErrorStateContext } from 'src/state/errorState.context'
 import { v4 as uuid } from 'uuid'
 import * as yup from 'yup'
 
@@ -76,6 +78,9 @@ export const AddEditForm = () => {
     data: { pastedImage },
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
+  const {
+    api: { throwError },
+  } = useContext(ErrorStateContext)
 
   const { control, handleSubmit, setValue, watch } = useForm<AddEditFormType>({
     defaultValues: defaultNewFormData,
@@ -84,12 +89,17 @@ export const AddEditForm = () => {
 
   const watchType = watch('type')
 
-  const additionalImageUrlsFieldArray = useFieldArray<AddEditFormType>({
+  const additionalImageUrlsFieldArray = useFieldArray({
     name: 'additionalImageUrls',
     control,
   })
 
-  const onSubmit = async () => {
+  const tagFieldArray = useFieldArray({
+    name: 'tags',
+    control,
+  })
+
+  const onSubmit: SubmitHandler<AddEditFormType> = async (data) => {
     // Call the DB, save/update the data
     if (!pastedImage) {
       console.error('No image data to save!')
@@ -98,20 +108,45 @@ export const AddEditForm = () => {
     const [commitImage] = saveImage(pastedImage)
     const info = await commitImage()
     console.info('[Clipboard] commit Image', info)
+    if (info === false) {
+      throwError('Failed to save image file!')
+      return
+    }
+    const dateTime = Date.now()
+
+    const tagsAsStringArray: string[] = data.tags.map((t) => t.tag)
 
     // add non-existing tags
-    const newTags: { [key: string]: Tag } = Object.fromEntries(formData.tags.map((tag) => [tag.name, tag]))
-    const existingTags = await db.tags.where('name').anyOf(Object.keys(newTags)).toArray()
+    const tagsToAddToDB: string[] = []
+    const existingTags = await db.tags.where('name').anyOf(tagsAsStringArray).toArray()
 
-    for (const tag of existingTags) {
-      delete newTags[tag.name]
+    for (const t of tagsAsStringArray) {
+      const foundTag = existingTags.find((exT) => exT.name === t)
+      if (!foundTag) {
+        tagsToAddToDB.push(t)
+      }
     }
 
-    db.tags.bulkAdd(Object.values(newTags))
+    db.tags.bulkAdd(
+      tagsToAddToDB.map<Tag>((t) => {
+        return {
+          name: t,
+          createdAt: dateTime,
+          updatedAt: dateTime,
+        }
+      }),
+    )
 
-    // db.content.add({
-    //   additionalUrls:
-    // })
+    db.content.add({
+      id: info.hash,
+      additionalUrls: data.additionalImageUrls.map((u) => u.additionalImageUrl),
+      tags: tagsAsStringArray,
+      sourceUrl: data.sourceUrl,
+      type: data.type,
+      contentType: data.contentType,
+      createdAt: dateTime,
+      updatedAt: dateTime,
+    })
 
     setPastedImage(null)
   }
@@ -121,69 +156,84 @@ export const AddEditForm = () => {
   }, [pastedImage])
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={2} height="100%" justifyContent="space-between">
-        <Stack spacing={2}>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Controller
-              name="contentType"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <FormControl fullWidth>
-                    <InputLabel id="default-image-explicity">Default Image Explicity</InputLabel>
-                    <Select labelId="default-image-explicity" {...field}>
-                      <MenuItem value="nsfw">NSFW</MenuItem>
-                      <MenuItem value="sfw">SFW</MenuItem>
-                      <MenuItem value="questionable">Questionable</MenuItem>
-                    </Select>
-                  </FormControl>
-                )
-              }}
-            />
-          </Stack>
+    <Stack spacing={2} height="100%" justifyContent="space-between">
+      <Stack spacing={2}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Controller
-            name="sourceUrl"
+            name="contentType"
             control={control}
             render={({ field }) => {
-              return <TextField {...field} label="Source URL" size="small" />
+              return (
+                <FormControl fullWidth>
+                  <InputLabel id="default-image-explicity">Default Image Explicity</InputLabel>
+                  <Select labelId="default-image-explicity" {...field}>
+                    <MenuItem value="nsfw">NSFW</MenuItem>
+                    <MenuItem value="sfw">SFW</MenuItem>
+                    <MenuItem value="questionable">Questionable</MenuItem>
+                  </Select>
+                </FormControl>
+              )
             }}
           />
-          <Stack spacing={2}>
-            <Typography>Additional urls</Typography>
-            {additionalImageUrlsFieldArray.fields.map((item, index) => {
-              return (
-                <Controller
-                  key={item.id}
-                  name="contentType"
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <Stack direction="row" alignItems="center" spacing={2}>
-                        <TextField {...field} label={`Additional url ${index}`} size="small" />
-                        <Box>
-                          <IconButton onClick={() => additionalImageUrlsFieldArray.remove(index)}>
-                            <CloseIcon />
-                          </IconButton>
-                        </Box>
-                      </Stack>
-                    )
-                  }}
-                />
-              )
-            })}
-            <Box>
-              <Button onClick={() => additionalImageUrlsFieldArray.append('')} startIcon={<AddIcon />}>
-                Add new additional url
-              </Button>
-            </Box>
-            <Typography>Mime type: {watchType}</Typography>
-          </Stack>
-          {/* TODO: make the tags and add/delete functions */}
-          <TagsInput tags={formData.tags} addTag={() => {}} deleteTag={() => {}} />
         </Stack>
-        <Button type="submit">Save</Button>
+        <Controller
+          name="sourceUrl"
+          control={control}
+          render={({ field }) => {
+            return <TextField {...field} label="Source URL" size="small" />
+          }}
+        />
+        <Stack spacing={2}>
+          <Typography>Additional urls</Typography>
+          {additionalImageUrlsFieldArray.fields.map((item, index) => {
+            return (
+              <Controller
+                key={item.id}
+                name="contentType"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <TextField {...field} label={`Additional url ${index}`} size="small" />
+                      <Box>
+                        <IconButton onClick={() => additionalImageUrlsFieldArray.remove(index)}>
+                          <CloseIcon />
+                        </IconButton>
+                      </Box>
+                    </Stack>
+                  )
+                }}
+              />
+            )
+          })}
+          <Box>
+            <Button
+              onClick={() =>
+                additionalImageUrlsFieldArray.append({
+                  additionalImageUrl: '',
+                })
+              }
+              startIcon={<AddIcon />}
+            >
+              Add new additional url
+            </Button>
+          </Box>
+          <Typography>Mime type: {watchType}</Typography>
+        </Stack>
+        <FormSearchTag
+          addTag={(newTag: string) => {
+            tagFieldArray.append({
+              tag: newTag,
+            })
+          }}
+        />
+        <Stack direction="row" spacing={1}>
+          {tagFieldArray.fields.map((item, index) => {
+            return <Chip key={item.id} label={item.tag} onDelete={() => tagFieldArray.remove(index)} />
+          })}
+        </Stack>
       </Stack>
-    </form>
+      <Button onClick={handleSubmit(onSubmit)}>Save</Button>
+    </Stack>
   )
 }

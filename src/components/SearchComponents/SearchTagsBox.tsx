@@ -5,18 +5,16 @@ import { Tag, TagName } from 'src/db/db'
 import { searchTags } from 'src/db/useDb'
 import { tag } from 'src/utils/utils'
 
-import { SearchList, SearchListItem, SearchListPaper } from './MiscComponents'
-import { SearchInput } from './SearchInput'
+import { SearchList, SearchListItem, SearchListPaper } from '../MiscComponents'
+import { SearchInput } from '../SearchInput'
 
 type SearchTagsBoxProps = {
   tags: Tag[]
-  addTag: (tag: Tag) => void
-  deleteTag: (index: number) => void
-  allowNew?: boolean
+  setTags: (newTags: Tag[]) => void
 }
 
 export const SearchTagsBox = (props: SearchTagsBoxProps) => {
-  const { tags, addTag, deleteTag, allowNew } = props
+  const { tags, setTags } = props
 
   const [isFocused, setIsFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -34,12 +32,17 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
 
   const handleOnTagClick = useCallback(
     (clickedTag: Tag) => {
+      setSearchText('')
+
+      /// TODO This includes creates problems
       if (tags.some((t) => t.name === clickedTag.name)) {
-        return deleteTag(tags.findIndex((t) => t.name === clickedTag.name))
+        return setTags(tags.filter((t) => t.name !== clickedTag.name))
       }
-      addTag(clickedTag)
+      const newTags = [...tags]
+      newTags.push(clickedTag)
+      return setTags(newTags)
     },
-    [tags, addTag, deleteTag],
+    [tags],
   )
 
   const handleOpenList = useCallback(() => {
@@ -61,22 +64,10 @@ export const SearchTagsBox = (props: SearchTagsBoxProps) => {
     if (searchText.length < 1) return
 
     // enter can select top result if it matches or new ones aren't allowed
-    if ((filteredTags[0] && filteredTags[0].name === searchText) || !allowNew) {
+    if (filteredTags[0] && filteredTags[0].name === searchText) {
       return handleOnTagClick(filteredTags[0])
     }
-
-    if (allowNew) {
-      const dateNow = Date.now()
-      const newTag = {
-        id: dateNow,
-        name: searchText,
-        createdAt: dateNow,
-        updatedAt: dateNow,
-      } as Tag
-
-      handleOnTagClick(newTag)
-    }
-  }, [allowNew, listIndex, searchText, filteredTags, handleOnTagClick])
+  }, [listIndex, searchText, filteredTags, handleOnTagClick])
 
   const handleOnArrowUpDown = useCallback(
     (direction: 'ArrowUp' | 'ArrowDown') => {

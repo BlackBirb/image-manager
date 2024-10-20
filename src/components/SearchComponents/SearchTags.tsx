@@ -4,19 +4,22 @@ import { Tag } from 'src/db/db'
 
 type SearchTagsProps = {
   tags: Tag[]
-  deleteTag: (index: number) => void
+  setTags: (newTags: Tag[]) => void
 }
 
 export const SearchTags = (props: SearchTagsProps) => {
-  const { tags, deleteTag } = props
+  const { tags, setTags } = props
 
   const handleRemoveTag = useCallback(
-    (deletedTag: Tag) => {
-      deleteTag(tags.findIndex((t) => t.name === deletedTag.name))
+    (deleteTag: Tag) => {
+      if (setTags) {
+        setTags(tags.filter((t) => t.name !== deleteTag.name))
+      }
     },
-    [tags, deleteTag],
+    [tags],
   )
 
+  // These will be styled differently from the ones in the AddEditForm Chips
   return (
     <Stack direction="row" spacing={1}>
       {tags?.map((tag) => {

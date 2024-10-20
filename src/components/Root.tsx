@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { ImageGallery } from 'src/components/ImageGallery'
-import { Search } from 'src/components/Search'
+import { Search } from 'src/components/SearchComponents/Search'
 import { TitleBar } from 'src/components/TitleBar'
 import { UserPreferences } from 'src/components/UserPreferences'
 
