@@ -82,8 +82,6 @@ export const AddEditForm = () => {
     api: { throwError },
   } = useContext(ErrorStateContext)
 
-  const { getFullImagePath } = useElectronApi()
-
   const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
 
   const { control, handleSubmit, setValue, watch } = useForm<AddEditFormType>({
@@ -150,14 +148,6 @@ export const AddEditForm = () => {
       }),
     )
 
-    const fullImagePath = await getFullImagePath(info)
-    const fullImageThumbnailPath = await getFullImagePath(info, true)
-
-    if (!fullImagePath || !fullImageThumbnailPath) {
-      throwError('Missing image path!')
-      return
-    }
-
     db.content.add({
       id: info.hash,
       additionalUrls: data.additionalImageUrls.map((u) => u.additionalImageUrl),
@@ -165,8 +155,7 @@ export const AddEditForm = () => {
       sourceUrl: data.sourceUrl,
       type: data.type,
       contentType: data.contentType,
-      fullPath: fullImagePath,
-      fullThumbnailPath: fullImageThumbnailPath,
+      ext: info.ext,
       createdAt: dateTime,
       updatedAt: dateTime,
     })

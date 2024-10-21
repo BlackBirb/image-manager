@@ -43,10 +43,9 @@ type Content = {
   tags: TagName[]
   contentType: ContentExplicityType
   sourceUrl: string
-  fullPath: string
-  fullThumbnailPath: string
   additionalUrls: string[]
   type: ContentType
+  ext: string
   createdAt: number
   updatedAt: number
 }

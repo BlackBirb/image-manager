@@ -106,7 +106,10 @@ export const savePrefetchedImage = async (handle: TmpImgHandle): Promise<SavedIm
   const thumbnailBuffer = await generateThumbnail(imgBuffer)
   writeFile(getImagePath(dir, hash, 'image/png', true), thumbnailBuffer)
 
-  return { hash, ext: getMimeExtension(mime) }
+  const ext = getMimeExtension(mime)
+  if (!ext) throw 'Invalid mime type, somehow?'
+
+  return { hash, ext }
 }
 
 export const discardPrefetchedImage = (handle: TmpImgHandle) => {
@@ -126,23 +129,17 @@ export const getImageHash = (data: ArrayBuffer): string => {
 
 export const getImageDir = (dir: string, imageHash: string) => path.join(dir, imageHash.slice(0, 2), imageHash.slice(2))
 
+// We assume mime is either "image/png" or ".png" directly, yolo
 export const getImagePath = (dir: string, imageHash: string, mime: string, thumbnail?: boolean) => {
   return path.join(
     getImageDir(dir, imageHash),
-    `${imageHash}${thumbnail ? '_thumbnail' : ''}.${getMimeExtension(mime)}`,
+    `${imageHash}${thumbnail ? '_thumbnail' : ''}.${getMimeExtension(mime) || mime}`,
   )
 }
 
-export const getFullImagePath = (imageInfo: SavedImageInfo, isThumbnail?: boolean) => {
-  if (!outputPath) {
-    throw 'Output path does not exists'!
-  }
-  const fullImagePath = path.join(
-    getImageDir(outputPath, imageInfo.hash),
-    `${imageInfo.hash}${isThumbnail ? '_thumbnail' : ''}.${imageInfo.ext}`,
-  )
-  return fullImagePath
-}
+// All thumbnails are .png
+export const resolveImageFile = (imageHash: string, ext: string, thumbnail: boolean) =>
+  getImagePath(getOutputPath(), imageHash, thumbnail ? 'png' : ext, thumbnail)
 
 const generateThumbnail = (data: Buffer) =>
   nativeImage

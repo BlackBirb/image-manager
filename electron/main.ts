@@ -6,6 +6,7 @@ import { app, BrowserWindow } from 'electron'
 import { initialSetup } from './app/initialSetup'
 import { addWindowIPCListeners, createIPCApi } from './app/ipcMain'
 import { getPersistentStore } from './app/persistentStore'
+import { createProtocolHandlers } from './app/protocol'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -125,6 +126,8 @@ initialSetup()
   .then(() => {
     createWindow('main')
     createIPCApi(windows)
+    createProtocolHandlers()
+
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow('main')

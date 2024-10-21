@@ -29,7 +29,7 @@ export const debounce = (fn: () => any, delay = 200) => {
 }
 
 export const getMimeExtension = (mimeType: string) =>
-  mimedb[mimeType].extensions ? mimedb[mimeType].extensions[0] : 'png' // have fun whatever reads this xd
+  mimedb[mimeType]?.extensions ? mimedb[mimeType].extensions[0] : null
 
 export const ensureDirectory = async (path: string) => {
   try {

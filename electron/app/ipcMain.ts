@@ -9,7 +9,6 @@ import {
   savePrefetchedImage,
   setOutputPath,
   TmpImgHandle,
-  getFullImagePath,
 } from './imageService'
 
 export const createIPCApi = (windows: WindowsManager): void => {
@@ -100,16 +99,6 @@ export const createIPCApi = (windows: WindowsManager): void => {
     } catch (err) {
       evn.sender.send('error', err)
       return false
-    }
-  })
-
-  ipcMain.handle('getFullImagePath', async (evn, imageInfo: SavedImageInfo, isThumbnail?: boolean): Promise<string> => {
-    try {
-      const p = await getFullImagePath(imageInfo, isThumbnail)
-      return p
-    } catch (err) {
-      evn.sender.send('error', err)
-      return ''
     }
   })
 }

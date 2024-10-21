@@ -1,4 +1,6 @@
 import { styled } from '@mui/material'
+import { useMemo } from 'react'
+import { getImageDir } from 'src/utils/utils'
 
 const ImageContainer = styled('div', {
   name: 'ImageContainer',
@@ -11,13 +13,16 @@ const ImageContainer = styled('div', {
 
 type ImageGridItemProps = {
   id: string
-  imagePath: string
+  ext: string
+  thumbnail?: boolean
 }
 
 export const ImageGridItem = (props: ImageGridItemProps) => {
-  const { id, imagePath } = props
-  console.log('ImageGridItem props: ', props)
-  // Need to call electron to give us the blob of the imagePath
+  const { id, ext, thumbnail } = props
+
+  const imagePath = useMemo(() => {
+    return getImageDir(id, ext, !!thumbnail)
+  }, [id, ext, thumbnail])
   return (
     <ImageContainer>
       <img src={imagePath} alt="id" />
