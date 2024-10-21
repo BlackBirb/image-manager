@@ -4,15 +4,15 @@ remove tags?
 3. Add inclusive tags filter
 4. Add exclusive tag filter
 
-When we upload an image, check the hash of the image if it already exists (id in content table)
-if it exists, go to edit preview instead of add new image..
-Make a wrapper that will do that because of how hook forms default values work.
+5. When we upload an image, check the hash of the image if it already exists (id in content table)
+  if it exists, go to edit preview instead of add new image..
+  Make a wrapper that will do that because of how hook forms default values work.
 
-Dashboard Grid images, right click with options to:
-edit image
-copy image path
-copy image (sharing)
-copy image url (sharing)(if it exists)
+6. Dashboard Grid images, right click with options to:
+  edit image
+  copy image path
+  copy image (sharing)
+  copy image url (sharing)(if it exists)
 
 
 When open Image top right icon button for going directly into edit mode.

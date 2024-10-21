@@ -17,7 +17,7 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
-import { saveImage } from 'src/hooks/useElectronApi'
+import { saveImage, useElectronApi } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { ErrorStateContext } from 'src/state/errorState.context'
 import { v4 as uuid } from 'uuid'
@@ -81,6 +81,8 @@ export const AddEditForm = () => {
   const {
     api: { throwError },
   } = useContext(ErrorStateContext)
+
+  const { getFullImagePath } = useElectronApi()
 
   const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
 
@@ -148,6 +150,14 @@ export const AddEditForm = () => {
       }),
     )
 
+    const fullImagePath = await getFullImagePath(info)
+    const fullImageThumbnailPath = await getFullImagePath(info, true)
+
+    if (!fullImagePath || !fullImageThumbnailPath) {
+      throwError('Missing image path!')
+      return
+    }
+
     db.content.add({
       id: info.hash,
       additionalUrls: data.additionalImageUrls.map((u) => u.additionalImageUrl),
@@ -155,6 +165,8 @@ export const AddEditForm = () => {
       sourceUrl: data.sourceUrl,
       type: data.type,
       contentType: data.contentType,
+      fullPath: fullImagePath,
+      fullThumbnailPath: fullImageThumbnailPath,
       createdAt: dateTime,
       updatedAt: dateTime,
     })

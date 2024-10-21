@@ -1,5 +1,6 @@
-import { Stack } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { ImageGridItem } from 'src/components/ImageGridItem'
 import { getAllImages } from 'src/db/useDB'
 
 export const ImageGallery = () => {
@@ -14,7 +15,17 @@ export const ImageGallery = () => {
         border: '1px solid red',
       }}
     >
-      <Stack>Image Gallery</Stack>
+      <Stack>
+        {content?.map((item) => {
+          return (
+            <ImageGridItem
+              key={item.id}
+              id={item.id}
+              imagePath={item.fullThumbnailPath} // ugh, folder path image ?
+            />
+          )
+        })}
+      </Stack>
       <Stack direction="row" justifyContent="center">
         Pagination
       </Stack>

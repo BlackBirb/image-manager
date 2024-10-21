@@ -30,6 +30,8 @@ export const onWindowMaximize = (cb: (maximized: boolean) => void) => {
 
 export const choosePath = (): Promise<Electron.OpenDialogReturnValue> => ipcRenderer.invoke('openPathChooser')
 export const setImageStorePath = (path: string): Promise<boolean> => ipcRenderer.invoke('setImageStorePath', path)
+export const getFullImagePath = (imageInfo: SavedImageInfo, isThumbnail?: boolean): Promise<string> =>
+  ipcRenderer.invoke('getFullImagePath', imageInfo, isThumbnail)
 
 export const onNodeError = (cb: (error: string) => void) => {
   const extractError = (_, err: string) => cb(err)

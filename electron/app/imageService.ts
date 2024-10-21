@@ -126,11 +126,22 @@ export const getImageHash = (data: ArrayBuffer): string => {
 
 export const getImageDir = (dir: string, imageHash: string) => path.join(dir, imageHash.slice(0, 2), imageHash.slice(2))
 
-export const getImagePath = (dir: string, imageHash: string, mime: string, thumbnail: boolean) => {
+export const getImagePath = (dir: string, imageHash: string, mime: string, thumbnail?: boolean) => {
   return path.join(
     getImageDir(dir, imageHash),
     `${imageHash}${thumbnail ? '_thumbnail' : ''}.${getMimeExtension(mime)}`,
   )
+}
+
+export const getFullImagePath = (imageInfo: SavedImageInfo, isThumbnail?: boolean) => {
+  if (!outputPath) {
+    throw 'Output path does not exists'!
+  }
+  const fullImagePath = path.join(
+    getImageDir(outputPath, imageInfo.hash),
+    `${imageInfo.hash}${isThumbnail ? '_thumbnail' : ''}.${imageInfo.ext}`,
+  )
+  return fullImagePath
 }
 
 const generateThumbnail = (data: Buffer) =>
