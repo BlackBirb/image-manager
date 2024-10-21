@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
@@ -82,6 +82,8 @@ export const AddEditForm = () => {
     api: { throwError },
   } = useContext(ErrorStateContext)
 
+  const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
+
   const { control, handleSubmit, setValue, watch } = useForm<AddEditFormType>({
     defaultValues: defaultNewFormData,
     resolver: yupResolver(validationSchema),
@@ -105,7 +107,12 @@ export const AddEditForm = () => {
       console.error('No image data to save!')
       return
     }
-    const [commitImage] = saveImage(pastedImage)
+    if (!imageHandle) {
+      console.error('Missing image handle!')
+      return
+    }
+    const [commitImage, _] = imageHandle
+
     const info = await commitImage()
     console.info('[Clipboard] commit Image', info)
     if (info === false) {
@@ -152,6 +159,11 @@ export const AddEditForm = () => {
   }
 
   useEffect(() => {
+    if (pastedImage !== null) {
+      console.info('Prefetching image: ', pastedImage)
+      setImageHandle(saveImage(pastedImage))
+    }
+
     if (pastedImage instanceof URL) setValue('sourceUrl', pastedImage.href)
   }, [pastedImage])
 

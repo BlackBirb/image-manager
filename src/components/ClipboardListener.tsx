@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
 import { useCallback, useContext, useLayoutEffect, useState } from 'react'
-import { saveImage, useElectronApi } from 'src/hooks/useElectronApi'
+import { useElectronApi } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 
 export const ClipboardListener = () => {
@@ -52,10 +52,6 @@ export const ClipboardListener = () => {
 
           setPastedImage(url)
           console.info('[Clipboard] pastedURL:', url.href)
-
-          const [commitImage] = saveImage(url)
-          const info = await commitImage()
-          console.info('[Clipboard] commit Image', info)
 
           return
         } catch (err) {
