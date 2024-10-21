@@ -3,11 +3,12 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SearchList, SearchListItem, SearchListPaper } from 'src/components/MiscComponents'
 import { SearchInput } from 'src/components/SearchInput'
+import { TagName } from 'src/db/db'
 import { searchTags } from 'src/db/useDb'
 import { tag } from 'src/utils/utils'
 
 type FormSearchTagProps = {
-  addTag: (newTag: string) => void
+  addTag: (newTag: TagName) => void
 }
 
 // This will be styled differently from the Main Search of tags
@@ -18,7 +19,7 @@ export const FormSearchTag = (props: FormSearchTagProps) => {
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   // This will probably go to the DB handler who will do the filtering
   // and return the list of tags
-  const [searchText, setSearchTextState] = useState('')
+  const [searchText, setSearchTextState] = useState<TagName>('' as TagName)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [listIndex, setListIndex] = useState(-1)
 
@@ -26,10 +27,9 @@ export const FormSearchTag = (props: FormSearchTagProps) => {
 
   // Can't really make it a memo, cuz it kinda is but eslint complains.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filteredTags =
-    useLiveQuery(() => searchTags(searchText), [searchText])?.map((item) => item.name as string) || []
+  const filteredTags = useLiveQuery(() => searchTags(searchText), [searchText])?.map((item) => item.name) || []
 
-  const handleOnTagClick = useCallback((clickedTag: string) => {
+  const handleOnTagClick = useCallback((clickedTag: TagName) => {
     setSearchText('')
     addTag(clickedTag)
   }, [])

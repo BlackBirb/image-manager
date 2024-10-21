@@ -25,7 +25,7 @@ const userPreferencesSchema = {
 export type TagName = string & { __brand: 'TagName' }
 
 export type Tag = {
-  name: string
+  name: TagName
   createdAt: number
   updatedAt: number
 }
@@ -40,7 +40,7 @@ const tagsSchema = {
 
 type Content = {
   id: string
-  tags: string[]
+  tags: TagName[]
   contentType: ContentExplicityType
   sourceUrl: string
   additionalUrls: string[]

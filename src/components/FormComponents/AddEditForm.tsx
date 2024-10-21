@@ -16,7 +16,7 @@ import {
 import { useContext, useEffect } from 'react'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
-import { ContentExplicityType, ContentType, db, Tag } from 'src/db/db'
+import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
 import { saveImage } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { ErrorStateContext } from 'src/state/errorState.context'
@@ -28,7 +28,7 @@ type FormAdditionalImageUrlType = {
 }
 
 type FormTagsType = {
-  tag: string
+  tag: TagName
 }
 
 const validationSchema = yup
@@ -39,7 +39,7 @@ const validationSchema = yup
     tags: yup
       .array(
         yup.object({
-          tag: yup.string().required(),
+          tag: yup.string<TagName>().required(),
         }),
       )
       .required(),
@@ -114,10 +114,10 @@ export const AddEditForm = () => {
     }
     const dateTime = Date.now()
 
-    const tagsAsStringArray: string[] = data.tags.map((t) => t.tag)
+    const tagsAsStringArray: TagName[] = data.tags.map((t) => t.tag)
 
     // add non-existing tags
-    const tagsToAddToDB: string[] = []
+    const tagsToAddToDB: TagName[] = []
     const existingTags = await db.tags.where('name').anyOf(tagsAsStringArray).toArray()
 
     for (const t of tagsAsStringArray) {
@@ -221,7 +221,7 @@ export const AddEditForm = () => {
           <Typography>Mime type: {watchType}</Typography>
         </Stack>
         <FormSearchTag
-          addTag={(newTag: string) => {
+          addTag={(newTag: TagName) => {
             tagFieldArray.append({
               tag: newTag,
             })
