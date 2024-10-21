@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
@@ -162,12 +162,16 @@ export const AddEditForm = () => {
     setPastedImage(null)
   }
 
-  const handleAddNewTag = (newTag: TagName) => {
-    if (watchTags.find((t) => t.tag === newTag)) return
-    tagFieldArray.append({
-      tag: newTag,
-    })
-  }
+  const handleAddNewTag = useCallback(
+    (newTag: TagName) => {
+      const tagExists = watchTags.find((t) => t.tag === newTag)
+      if (tagExists) return
+      tagFieldArray.append({
+        tag: newTag,
+      })
+    },
+    [watchTags],
+  )
 
   useEffect(() => {
     if (pastedImage !== null) {

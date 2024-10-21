@@ -29,10 +29,13 @@ export const FormSearchTag = (props: FormSearchTagProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filteredTags = useLiveQuery(() => searchTags(searchText), [searchText])?.map((item) => item.name) || []
 
-  const handleOnTagClick = useCallback((clickedTag: TagName) => {
-    setSearchText('')
-    onAddTag(clickedTag)
-  }, [])
+  const handleOnTagClick = useCallback(
+    (clickedTag: TagName) => {
+      setSearchText('')
+      onAddTag(clickedTag)
+    },
+    [onAddTag],
+  )
 
   const handleOpenList = useCallback(() => {
     setAnchorEl(searchWrapperRef.current)

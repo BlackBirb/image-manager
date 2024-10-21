@@ -1,21 +1,12 @@
-Folder selected by user is in renderer, need to pass it to `electronAPI.setImageStorePath` somewhere on startup...
-Also it returns bool to indicate if the folder still exists, need to respect that just in case
-
-Add tags in the db from the imageAdd panel
 remove tags?
-Add the first image:
-  Generate the ID from the MP5 cache of the original file.
-  Generate the thumbnail.
-  Save them into the folder structure we discussed.
-  Fill the form enough so we can save the DB data.
+1. Get the whole gallery and render it all in order to make the UI Grid.
+2. add pagination. (1, 2, inputfield, 3, 4, 750 (last))
+3. Add inclusive tags filter
+4. Add exclusive tag filter
 
-Get the whole gallery and render it all in order to make the UI Grid.
-Add pagination
-Add tags search
-
-TBD
-
-
+When we upload an image, check the hash of the image if it already exists (id in content table)
+if it exists, go to edit preview instead of add new image..
+Make a wrapper that will do that because of how hook forms default values work.
 
 Dashboard Grid images, right click with options to:
 edit image
