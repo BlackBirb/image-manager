@@ -8,12 +8,12 @@ import { searchTags } from 'src/db/useDb'
 import { tag } from 'src/utils/utils'
 
 type FormSearchTagProps = {
-  addTag: (newTag: TagName) => void
+  onAddTag: (newTag: TagName) => void
 }
 
 // This will be styled differently from the Main Search of tags
 export const FormSearchTag = (props: FormSearchTagProps) => {
-  const { addTag } = props
+  const { onAddTag } = props
 
   const [isFocused, setIsFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -31,7 +31,7 @@ export const FormSearchTag = (props: FormSearchTagProps) => {
 
   const handleOnTagClick = useCallback((clickedTag: TagName) => {
     setSearchText('')
-    addTag(clickedTag)
+    onAddTag(clickedTag)
   }, [])
 
   const handleOpenList = useCallback(() => {

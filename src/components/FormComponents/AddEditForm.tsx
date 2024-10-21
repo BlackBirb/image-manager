@@ -90,6 +90,7 @@ export const AddEditForm = () => {
   })
 
   const watchType = watch('type')
+  const watchTags = watch('tags')
 
   const additionalImageUrlsFieldArray = useFieldArray({
     name: 'additionalImageUrls',
@@ -121,7 +122,10 @@ export const AddEditForm = () => {
     }
     const dateTime = Date.now()
 
-    const tagsAsStringArray: TagName[] = data.tags.map((t) => t.tag)
+    const tagsAsStringArray: TagName[] = data.tags
+      .map((t) => t.tag)
+      // Filter duplicate values just in case the append function missed.
+      .filter((t, index, array) => array.indexOf(t) === index)
 
     // add non-existing tags
     const tagsToAddToDB: TagName[] = []
@@ -156,6 +160,13 @@ export const AddEditForm = () => {
     })
 
     setPastedImage(null)
+  }
+
+  const handleAddNewTag = (newTag: TagName) => {
+    if (watchTags.find((t) => t.tag === newTag)) return
+    tagFieldArray.append({
+      tag: newTag,
+    })
   }
 
   useEffect(() => {
@@ -232,13 +243,7 @@ export const AddEditForm = () => {
           </Box>
           <Typography>Mime type: {watchType}</Typography>
         </Stack>
-        <FormSearchTag
-          addTag={(newTag: TagName) => {
-            tagFieldArray.append({
-              tag: newTag,
-            })
-          }}
-        />
+        <FormSearchTag onAddTag={handleAddNewTag} />
         <Stack direction="row" spacing={1}>
           {tagFieldArray.fields.map((item, index) => {
             return <Chip key={item.id} label={item.tag} onDelete={() => tagFieldArray.remove(index)} />
