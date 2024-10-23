@@ -1,29 +1,30 @@
-import { Box, Stack } from '@mui/material'
+import { Box, Grid2, Stack } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useState } from 'react'
 import { ImageGridItem } from 'src/components/ImageGridItem'
+import { Pagination } from 'src/components/Pagination'
 import { getAllImages, getUserPreferences } from 'src/db/useDB'
 
 export const ImageGallery = () => {
   const content = useLiveQuery(getAllImages)
 
+  const [page, setPage] = useState(1)
+
   console.log('content: ', content)
 
   return (
-    <Stack
-      flexGrow={1}
-      justifyContent="space-between"
-      sx={{
-        border: '1px solid red',
-      }}
-    >
-      <Stack>
+    <Stack flexGrow={1} justifyContent="space-between" spacing={2}>
+      {/* TODO add the mosaic grid from the user preferences */}
+      <Grid2 container spacing={2}>
         {content?.map((item) => {
-          return <ImageGridItem key={item.id} id={item.id} ext={item.ext} thumbnail />
+          return (
+            <Grid2 key={item.id}>
+              <ImageGridItem id={item.id} ext={item.ext} thumbnail />
+            </Grid2>
+          )
         })}
-      </Stack>
-      <Stack direction="row" justifyContent="center">
-        Pagination
-      </Stack>
+      </Grid2>
+      <Pagination currentPage={page} lastPage={4} onPageChange={setPage} />
     </Stack>
   )
 }

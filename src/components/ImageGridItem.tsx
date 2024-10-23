@@ -5,10 +5,14 @@ import { getImageDir } from 'src/utils/utils'
 const ImageContainer = styled('div', {
   name: 'ImageContainer',
 })(() => ({
-  width: '100%',
-  height: '100%',
-  maxWidth: 100,
-  maxHeight: 300,
+  width: 200,
+  height: 300,
+  '&>div': {
+    width: '100%',
+    height: '100%',
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+  },
 }))
 
 type ImageGridItemProps = {
@@ -25,7 +29,11 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
   }, [id, ext, thumbnail])
   return (
     <ImageContainer>
-      <img src={imagePath} alt="id" />
+      <div
+        style={{
+          backgroundImage: `url(${imagePath})`,
+        }}
+      />
     </ImageContainer>
   )
 }
