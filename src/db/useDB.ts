@@ -15,3 +15,5 @@ export const searchTags = async (text: string) => {
   return getAllTags()
 }
 export const getAllImages = () => db.content.toArray()
+export const getPaginationImages = (offset: number, limit: number) => db.content.offset(offset).limit(limit).toArray()
+export const getAllImagesCount = () => db.content.count()

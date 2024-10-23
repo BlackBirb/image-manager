@@ -43,7 +43,7 @@ const validationSchema = yup
         }),
       )
       .required(),
-    sourceUrl: yup.string().required(),
+    sourceUrl: yup.string(),
     additionalImageUrls: yup
       .array(
         yup.object({

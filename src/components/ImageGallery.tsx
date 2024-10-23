@@ -1,14 +1,36 @@
 import { Box, Grid2, Stack } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ImageGridItem } from 'src/components/ImageGridItem'
 import { Pagination } from 'src/components/Pagination'
-import { getAllImages, getUserPreferences } from 'src/db/useDB'
+import { getAllImages, getAllImagesCount, getPaginationImages, getUserPreferences } from 'src/db/useDB'
 
 export const ImageGallery = () => {
-  const content = useLiveQuery(getAllImages)
-
+  const user = useLiveQuery(getUserPreferences)
+  const allImagesCount = useLiveQuery(getAllImagesCount)
   const [page, setPage] = useState(1)
+
+  const lastPage = useMemo(() => {
+    if (!user) return 1000
+    if (!allImagesCount) return 1000
+    return Math.ceil(allImagesCount / user?.pagination)
+  }, [user, allImagesCount])
+
+  const pageToFilter = useMemo(() => {
+    if (!user) return 0
+    if (page === 1) return 0
+    return (page - 1) * user?.pagination
+  }, [page, user])
+
+  const content = useLiveQuery(
+    () =>
+      getPaginationImages(
+        pageToFilter,
+        user?.pagination || 50,
+        // user?.pagination
+      ),
+    [pageToFilter],
+  )
 
   console.log('content: ', content)
 
@@ -24,7 +46,7 @@ export const ImageGallery = () => {
           )
         })}
       </Grid2>
-      <Pagination currentPage={page} lastPage={4} onPageChange={setPage} />
+      <Pagination currentPage={page} lastPage={lastPage} onPageChange={setPage} />
     </Stack>
   )
 }
