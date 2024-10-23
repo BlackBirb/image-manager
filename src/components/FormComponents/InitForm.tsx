@@ -89,6 +89,7 @@ export const InitForm = () => {
                 <FormControl fullWidth>
                   <InputLabel id="pagination">Pagination</InputLabel>
                   <Select labelId="pagination" {...field}>
+                    <MenuItem value="10">10</MenuItem>
                     <MenuItem value="20">20</MenuItem>
                     <MenuItem value="50">50</MenuItem>
                     <MenuItem value="100">100</MenuItem>

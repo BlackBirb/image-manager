@@ -25,7 +25,7 @@ export const UserPreferences = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
-  const preferences = useLiveQuery(() => getUserPreferences(), [])
+  const preferences = useLiveQuery(getUserPreferences)
 
   const onToggleOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl((prev) => {
@@ -97,6 +97,7 @@ export const UserPreferences = () => {
                 value={preferences.pagination.toString()}
                 onChange={handleOnChangePagination}
               >
+                <MenuItem value="10">10</MenuItem>
                 <MenuItem value="20">20</MenuItem>
                 <MenuItem value="50">50</MenuItem>
                 <MenuItem value="100">100</MenuItem>

@@ -17,35 +17,40 @@ const GridLayout = styled('div', {
   gridTemplateColumns: '1fr',
   gridTemplateRows: 'auto 1fr',
   gridColumnGap: '0px',
-  gridRowGap: '0px',
+  gridRowGap: '8px',
 }))
 
 const Main = styled('section', {
   name: 'Main',
 })(() => ({
+  display: 'grid',
   height: '100%',
   width: '100%',
+  gridTemplateColumns: '1fr',
+  gridTemplateRows: 'auto 1fr',
+  gridColumnGap: '0px',
+  gridRowGap: '8px',
 }))
 
 export const Root = () => {
   return (
-    <GridLayout>
+    <GridLayout id="GridLayout">
       <div id="header">
         <TitleBar />
       </div>
       <Main id="main">
-        <Stack height="100%">
+        <Stack>
           <Stack direction="row" justifyContent="space-between" pl={4} pr={2}>
             <Search />
             <UserPreferences />
           </Stack>
-          <Stack flexGrow={1} p={4}>
-            <ImageGallery />
-          </Stack>
         </Stack>
-        <ClipboardListener />
-        <ImagePreview />
+        <Stack height="100%">
+          <ImageGallery />
+        </Stack>
       </Main>
+      <ImagePreview />
+      <ClipboardListener />
     </GridLayout>
   )
 }

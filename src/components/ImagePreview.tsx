@@ -27,7 +27,7 @@ const Paper = styled(MuiPaper, {
   maxHeight: '80%',
   width: '100%',
   maxWidth: '80%',
-  backgroundColor: 'rgba(0,0,0,0.5)',
+  backgroundColor: 'rgba(0,0,0,0.8)',
   padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius * 2,
 }))

@@ -15,8 +15,15 @@ export const ErrorHandler = (props: PropsWithChildren<Record<never, unknown>>) =
   }, [clearErrors])
 
   const renderedError = useMemo(() => {
+    if (errors.length === 0) return null
     return (
-      <Stack>
+      <Stack
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+        }}
+      >
         🔥{errors.map((err) => err.message).join('🔥')}🔥
         <Button onClick={handleButtonClick}>Clear</Button>
       </Stack>
@@ -25,9 +32,9 @@ export const ErrorHandler = (props: PropsWithChildren<Record<never, unknown>>) =
 
   // make it ✨pretty✨ please
   return (
-    <Stack>
+    <>
       {renderedError}
-      <Stack>{children}</Stack>
-    </Stack>
+      {children}
+    </>
   )
 }
