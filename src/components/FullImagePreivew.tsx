@@ -1,4 +1,4 @@
-import { Backdrop, Collapse, List, ListItemButton, ListItemText, Paper, styled } from '@mui/material'
+import { Backdrop, Box, Collapse, List, ListItemButton, ListItemText, Paper, Stack, styled } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { getImageWithId } from 'src/db/useDB'
@@ -10,8 +10,8 @@ type MousePositionType = {
   y: number
 }
 
-const ImageContainer = styled('div', {
-  name: 'ImageContainer',
+const FullImagePreviewContainer = styled('div', {
+  name: 'FullImagePreview',
 })(() => ({
   position: 'absolute',
   inset: 0,
@@ -75,18 +75,24 @@ export const FullImagePreview = () => {
 
   if (!selectedImageId) return
 
+  // Add on esc key listener in order to get out of the full image preview if image is too big and
+  // we can't click outside it
   return (
-    <ImageContainer>
+    <FullImagePreviewContainer>
       <Backdrop open onClick={handleCloseImage} />
-      <img
-        src={imagePath}
-        height="95%"
-        onClick={handleLeftClick}
-        onContextMenu={handleRightClick}
-        style={{
-          zIndex: 1,
-        }}
-      />
+      <Stack width="100%" height="100%" p={4} direction="row" alignItems="center" justifyContent="center">
+        <img
+          src={imagePath}
+          onClick={handleLeftClick}
+          onContextMenu={handleRightClick}
+          style={{
+            zIndex: 1,
+            maxWidth: '100%',
+            maxHeight: '100%',
+            height: 'auto',
+          }}
+        />
+      </Stack>
 
       <Paper
         style={{
@@ -108,6 +114,6 @@ export const FullImagePreview = () => {
           </List>
         </Collapse>
       </Paper>
-    </ImageContainer>
+    </FullImagePreviewContainer>
   )
 }

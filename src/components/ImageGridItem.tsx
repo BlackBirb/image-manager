@@ -38,8 +38,8 @@ const EditButtonWrapper = styled('div', {
   },
 }))
 
-const ViewFullScreen = styled('div', {
-  name: 'ViewFullScreen',
+const HoverEffect = styled('div', {
+  name: 'HoverEffect',
 })(() => ({
   position: 'absolute',
   inset: 0,
@@ -68,6 +68,11 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
     return getImageDir(id, ext, !!thumbnail)
   }, [id, ext, thumbnail])
 
+  const handleOnImageEdit = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    // TODO: do the edit image.
+  }, [])
+
   const handleOnImageClick = useCallback(() => {
     setSelectedImageId(id)
   }, [id, setSelectedImageId])
@@ -79,14 +84,16 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
           backgroundImage: `url(${imagePath})`,
         }}
       />
-      <EditButtonWrapper>
-        <Box p={0.5}>
-          <IconButton>
-            <SettingsIcon />
-          </IconButton>
-        </Box>
-      </EditButtonWrapper>
-      <ViewFullScreen></ViewFullScreen>
+
+      <HoverEffect>
+        <EditButtonWrapper>
+          <Box p={0.5}>
+            <IconButton onClick={handleOnImageEdit}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
+        </EditButtonWrapper>
+      </HoverEffect>
     </ImageContainer>
   )
 }
