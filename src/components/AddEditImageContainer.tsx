@@ -32,7 +32,7 @@ const Paper = styled(MuiPaper, {
   borderRadius: theme.shape.borderRadius * 2,
 }))
 
-export const ImagePreview = () => {
+export const AddEditImageContainer = () => {
   const {
     data: { imagePreviewUrl },
     api: { setPastedImage },
@@ -43,15 +43,20 @@ export const ImagePreview = () => {
   const handleBackdropClose = useCallback(() => {
     setAlert(true)
   }, [])
+
   const handleCloseDialog = useCallback((event: any) => {
     event.stopPropagation()
     setAlert(false)
   }, [])
-  const handleAgree = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    handleCloseDialog(event)
-    setPastedImage(null)
-  }, [])
+
+  const handleAgree = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation()
+      handleCloseDialog(event)
+      setPastedImage(null)
+    },
+    [handleCloseDialog, setPastedImage],
+  )
 
   if (!imagePreviewUrl) return null
 

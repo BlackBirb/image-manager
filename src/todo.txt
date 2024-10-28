@@ -1,6 +1,4 @@
 remove tags?
-1. Get the whole gallery and render it all in order to make the UI Grid.
-2. add pagination. (1, 2, inputfield, 3, 4, 750 (last))
 3. Add inclusive tags filter
 4. Add exclusive tag filter
 

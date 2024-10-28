@@ -33,7 +33,7 @@ export const ImageGallery = () => {
     <Stack flexGrow={1} justifyContent="space-between" spacing={2}>
       {/* TODO add the mosaic grid from the user preferences */}
       <Box sx={{ height: '0px', flex: '1 1 auto', overflow: 'auto' }}>
-        <Grid2 container spacing={2} p={2}>
+        <Grid2 container p={2} spacing={2} alignItems="center" justifyContent="center">
           {content?.map((item) => {
             return (
               <Grid2 key={item.id}>

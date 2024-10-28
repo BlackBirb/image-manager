@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react'
+import { SelectionStateContextProvider } from 'src/state/selectionState.context'
 
 import { ClipboardStateContextProvider } from './clipboardState.context'
 import { ErrorStateContextProvider } from './errorState.context'
@@ -9,7 +10,9 @@ export const State = (props: PropsWithChildren<Record<never, unknown>>) => {
   return (
     <ErrorStateContextProvider>
       <SearchStateContextProvider>
-        <ClipboardStateContextProvider>{children}</ClipboardStateContextProvider>
+        <SelectionStateContextProvider>
+          <ClipboardStateContextProvider>{children}</ClipboardStateContextProvider>
+        </SelectionStateContextProvider>
       </SearchStateContextProvider>
     </ErrorStateContextProvider>
   )
