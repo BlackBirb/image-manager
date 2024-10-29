@@ -20,7 +20,6 @@ import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
 import { saveImage } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { ErrorStateContext } from 'src/state/errorState.context'
-import { v4 as uuid } from 'uuid'
 import * as yup from 'yup'
 
 type FormAdditionalImageUrlType = {
@@ -56,7 +55,6 @@ const validationSchema = yup
   .required()
 
 type AddEditFormType = {
-  id: string
   contentType: ContentExplicityType
   tags: FormTagsType[]
   sourceUrl: string
@@ -65,7 +63,6 @@ type AddEditFormType = {
 }
 
 const defaultNewFormData: AddEditFormType = {
-  id: uuid(),
   contentType: 'nsfw', // TODO fetch user preferences
   tags: [],
   sourceUrl: '',
@@ -73,7 +70,12 @@ const defaultNewFormData: AddEditFormType = {
   type: 'image',
 }
 
-export const AddEditForm = () => {
+type AddEditFormProps = {
+  defaultValues?: AddEditFormType
+}
+
+export const AddEditForm = (props: AddEditFormProps) => {
+  const { defaultValues } = props
   const {
     data: { pastedImage },
     api: { setPastedImage },
@@ -85,7 +87,7 @@ export const AddEditForm = () => {
   const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
 
   const { control, handleSubmit, setValue, watch } = useForm<AddEditFormType>({
-    defaultValues: defaultNewFormData,
+    defaultValues: defaultValues || defaultNewFormData,
     resolver: yupResolver(validationSchema),
   })
 

@@ -1,9 +1,63 @@
-import { Backdrop, Box, Collapse, List, ListItemButton, ListItemText, Paper, Stack, styled } from '@mui/material'
+import { Settings as SettingsIcon } from '@mui/icons-material'
+import {
+  Backdrop,
+  Collapse,
+  List,
+  ListItemButton,
+  ListItemText,
+  Paper,
+  Stack,
+  styled,
+  Box,
+  IconButton,
+} from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useContext, useMemo, useState } from 'react'
-import { getImageWithId } from 'src/db/useDB'
+import { getContentWithId } from 'src/db/useDB'
 import { SelectionStateContext } from 'src/state/selectionState.context'
 import { getImageDir } from 'src/utils/utils'
+
+const EditButtonWrapper = styled('div', {
+  name: 'EditButtonWrapper',
+})(() => ({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  width: '150px',
+  height: '150px',
+  opacity: 0,
+  transition: 'opacity 0.2s ease-in-out',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'start',
+  justifyContent: 'flex-end',
+  zIndex: 11,
+  '&:hover': {
+    opacity: 1,
+    '&>div': {
+      opacity: 1,
+    },
+    '&>.EditButtonHoverEffect': {
+      width: '160px',
+      height: '150px',
+    },
+  },
+}))
+
+const EditButtonHoverEffect = styled('div', {
+  name: 'EditButtonHoverEffect',
+})(() => ({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  width: '0px',
+  height: '0px',
+  opacity: 0,
+  transition: 'opacity 0.2s ease-in-out, width 0.2s ease-in-out, height 0.2s ease-in-out',
+  backgroundColor: 'rgba(0,0,0,0.2)',
+  borderBottomLeftRadius: '100%',
+  clipPath: 'border-box',
+}))
 
 type MousePositionType = {
   x: number
@@ -13,22 +67,23 @@ type MousePositionType = {
 const FullImagePreviewContainer = styled('div', {
   name: 'FullImagePreview',
 })(() => ({
-  position: 'absolute',
+  position: 'fixed',
   inset: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  zIndex: 10,
 }))
 
 export const FullImagePreview = () => {
   const {
     data: { selectedImageId },
-    api: { setSelectedImageId },
+    api: { setSelectedImageId, setContentIdToEdit },
   } = useContext(SelectionStateContext)
 
   const [mousePosition, setMousePosition] = useState<MousePositionType | null>(null)
 
-  const imageData = useLiveQuery(() => getImageWithId(selectedImageId), [selectedImageId])
+  const imageData = useLiveQuery(() => getContentWithId(selectedImageId), [selectedImageId])
 
   const imagePath = useMemo(() => {
     if (!imageData?.id) return ''
@@ -73,6 +128,15 @@ export const FullImagePreview = () => {
     [handleOnCloseMenu],
   )
 
+  const handleOnContentEdit = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation()
+      setContentIdToEdit(selectedImageId)
+      handleCloseImage()
+    },
+    [selectedImageId, setContentIdToEdit, handleCloseImage],
+  )
+
   if (!selectedImageId) return
 
   // Add on esc key listener in order to get out of the full image preview if image is too big and
@@ -81,17 +145,27 @@ export const FullImagePreview = () => {
     <FullImagePreviewContainer>
       <Backdrop open onClick={handleCloseImage} />
       <Stack width="100%" height="100%" p={4} direction="row" alignItems="center" justifyContent="center">
-        <img
-          src={imagePath}
-          onClick={handleLeftClick}
-          onContextMenu={handleRightClick}
-          style={{
-            zIndex: 1,
-            maxWidth: '100%',
-            maxHeight: '100%',
-            height: 'auto',
-          }}
-        />
+        <Stack direction="row" height="100%" position="relative">
+          <img
+            src={imagePath}
+            onClick={handleLeftClick}
+            onContextMenu={handleRightClick}
+            style={{
+              zIndex: 1,
+              maxWidth: '100%',
+              maxHeight: '100%',
+              height: 'auto',
+            }}
+          />
+          <EditButtonWrapper>
+            <Box p={0.5} zIndex={11}>
+              <IconButton onClick={handleOnContentEdit}>
+                <SettingsIcon />
+              </IconButton>
+            </Box>
+            <EditButtonHoverEffect className="EditButtonHoverEffect" />
+          </EditButtonWrapper>
+        </Stack>
       </Stack>
 
       <Paper

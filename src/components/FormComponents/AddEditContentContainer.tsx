@@ -1,9 +1,8 @@
 import { Backdrop, Button, Dialog, DialogActions, DialogTitle, Paper as MuiPaper, Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useCallback, useContext, useState } from 'react'
-import { ClipboardStateContext } from 'src/state/clipboardState.context'
+import { useCallback, useState } from 'react'
 
-import { AddEditForm } from './FormComponents/AddEditForm'
+import { AddEditForm } from './AddEditForm'
 
 const Main = styled('div', {
   name: 'Main',
@@ -32,11 +31,13 @@ const Paper = styled(MuiPaper, {
   borderRadius: theme.shape.borderRadius * 2,
 }))
 
-export const AddEditImageContainer = () => {
-  const {
-    data: { imagePreviewUrl },
-    api: { setPastedImage },
-  } = useContext(ClipboardStateContext)
+type AddEditContentContainerProps = {
+  imageUrl: string
+  clearImageUrl: () => void
+}
+
+export const AddEditContentContainer = (props: AddEditContentContainerProps) => {
+  const { imageUrl, clearImageUrl } = props
 
   const [alert, setAlert] = useState(false)
 
@@ -53,12 +54,10 @@ export const AddEditImageContainer = () => {
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
       handleCloseDialog(event)
-      setPastedImage(null)
+      clearImageUrl()
     },
-    [handleCloseDialog, setPastedImage],
+    [handleCloseDialog, clearImageUrl],
   )
-
-  if (!imagePreviewUrl) return null
 
   return (
     <>
@@ -72,7 +71,7 @@ export const AddEditImageContainer = () => {
           >
             <Stack spacing={2} width="100%" height="100%">
               <Stack alignItems="center" justifyContent="center" width="100%" height="100%" maxHeight="200px">
-                <ImageView src={imagePreviewUrl} />
+                <ImageView src={imageUrl} />
               </Stack>
               <AddEditForm />
             </Stack>

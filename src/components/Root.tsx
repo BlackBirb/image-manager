@@ -1,13 +1,14 @@
 import { Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { AddContentContainer } from 'src/components/FormComponents/AddContentContainer'
 import { FullImagePreview } from 'src/components/FullImagePreivew'
 import { ImageGallery } from 'src/components/ImageGallery'
 import { Search } from 'src/components/SearchComponents/Search'
 import { TitleBar } from 'src/components/TitleBar'
 import { UserPreferences } from 'src/components/UserPreferences'
 
-import { AddEditImageContainer } from './AddEditImageContainer'
 import { ClipboardListener } from './ClipboardListener'
+import { AddEditImageContainer } from './FormComponents/AddEditContentContainer'
 
 const GridLayout = styled('div', {
   name: 'GridLayout',
@@ -51,7 +52,7 @@ export const Root = () => {
         </Stack>
       </Main>
       <FullImagePreview />
-      <AddEditImageContainer />
+      <AddContentContainer />
       <ClipboardListener />
     </GridLayout>
   )

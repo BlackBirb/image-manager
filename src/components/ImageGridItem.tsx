@@ -1,6 +1,6 @@
-import { Settings as SettingsIcon } from '@mui/icons-material'
-import { Box, IconButton, styled } from '@mui/material'
+import { styled } from '@mui/material'
 import { useCallback, useContext, useMemo } from 'react'
+import { ContentHoverEffect } from 'src/components/ContentHoverEffect'
 import { SelectionStateContext } from 'src/state/selectionState.context'
 import { getImageDir } from 'src/utils/utils'
 
@@ -19,38 +19,6 @@ const ImageContainer = styled('div', {
   },
 }))
 
-const EditButtonWrapper = styled('div', {
-  name: 'EditButtonWrapper',
-})(() => ({
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  width: '80px',
-  height: '80px',
-  opacity: 0,
-  transition: 'opacity 0.2s ease-in-out',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'start',
-  justifyContent: 'flex-end',
-  '&:hover': {
-    opacity: 1,
-  },
-}))
-
-const HoverEffect = styled('div', {
-  name: 'HoverEffect',
-})(() => ({
-  position: 'absolute',
-  inset: 0,
-  opacity: 0,
-  transition: 'opacity 0.2s ease-in-out',
-  backgroundColor: 'rgba(0,0,0,0.2)',
-  '&:hover': {
-    opacity: 1,
-  },
-}))
-
 type ImageGridItemProps = {
   id: string
   ext: string
@@ -61,6 +29,10 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
   const { id, ext, thumbnail } = props
 
   const {
+    api: { setContentIdToEdit },
+  } = useContext(SelectionStateContext)
+
+  const {
     api: { setSelectedImageId },
   } = useContext(SelectionStateContext)
 
@@ -68,32 +40,27 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
     return getImageDir(id, ext, !!thumbnail)
   }, [id, ext, thumbnail])
 
-  const handleOnImageEdit = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    // TODO: do the edit image.
-  }, [])
+  const handleOnContentEdit = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation()
+      setContentIdToEdit(id)
+    },
+    [id, setContentIdToEdit],
+  )
 
-  const handleOnImageClick = useCallback(() => {
+  const handleOnContentClick = useCallback(() => {
     setSelectedImageId(id)
   }, [id, setSelectedImageId])
 
   return (
-    <ImageContainer onClick={handleOnImageClick}>
+    <ImageContainer onClick={handleOnContentClick}>
       <div
         style={{
           backgroundImage: `url(${imagePath})`,
         }}
       />
 
-      <HoverEffect>
-        <EditButtonWrapper>
-          <Box p={0.5}>
-            <IconButton onClick={handleOnImageEdit}>
-              <SettingsIcon />
-            </IconButton>
-          </Box>
-        </EditButtonWrapper>
-      </HoverEffect>
+      <ContentHoverEffect onEditContent={handleOnContentEdit} />
     </ImageContainer>
   )
 }

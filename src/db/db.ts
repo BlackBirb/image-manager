@@ -38,7 +38,7 @@ const tagsSchema = {
   tags: '++id, name',
 }
 
-type Content = {
+export type Content = {
   id: string
   tags: TagName[]
   contentType: ContentExplicityType

@@ -17,4 +17,4 @@ export const searchTags = async (text: string) => {
 export const getAllImages = () => db.content.toArray()
 export const getPaginationImages = (offset: number, limit: number) => db.content.offset(offset).limit(limit).toArray()
 export const getAllImagesCount = () => db.content.count()
-export const getImageWithId = (id: string) => db.content.where('id').equals(id).first()
+export const getContentWithId = (id: string) => db.content.where('id').equals(id).first()
