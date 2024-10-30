@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { AddEditContentContainer } from 'src/components/FormComponents/AddEditContentContainer'
 import { AddEditFormType } from 'src/components/FormComponents/AddEditForm'
 import { useGetContentPath } from 'src/hooks/useGetContentPath'
@@ -25,12 +25,17 @@ export const EditContentContainer = () => {
       type: contentDataToEdit?.type,
     }
   }, [contentDataToEdit])
+
+  const onCloseForm = useCallback(() => {
+    setContentIdToEdit('')
+  }, [setContentIdToEdit])
+
   if (!contentDataToEdit || !defaultValues) return
 
   return (
     <AddEditContentContainer
       imageUrl={imagePath}
-      onCloseForm={() => setContentIdToEdit('')}
+      onCloseForm={onCloseForm}
       editingId={contentIdToEdit}
       defaultValues={defaultValues}
     />

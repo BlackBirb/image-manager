@@ -78,7 +78,6 @@ type AddEditFormProps = {
 // TODO: make it work for edit.
 export const AddEditForm = (props: AddEditFormProps) => {
   const { editingId, defaultValues, handleCloseForm } = props
-  console.log('AddEditForm editingId: ', editingId)
 
   // Maybe move these contexts outside.
   const {
@@ -105,9 +104,10 @@ export const AddEditForm = (props: AddEditFormProps) => {
 
   const watchType = watch('type')
   const watchTags = watch('tags')
-  const watchAll = watch()
-  console.log('watchAll: ', watchAll)
-  console.log('errors: ', errors)
+  // We should handle this better.
+  // I can add error messages to each input.
+  // and a global one for other stuff.
+  console.log('[Debug form] Add edit form errors: ', errors)
 
   const additionalImageUrlsFieldArray = useFieldArray({
     name: 'additionalImageUrls',
@@ -230,7 +230,7 @@ export const AddEditForm = (props: AddEditFormProps) => {
         handleCloseForm()
       }
     },
-    [editingId],
+    [editingId, handleCloseForm],
   )
 
   const onSubmit: SubmitHandler<AddEditFormType> = async (data) => {
