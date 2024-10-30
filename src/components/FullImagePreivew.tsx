@@ -12,7 +12,7 @@ import {
   IconButton,
 } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { getContentWithId } from 'src/db/useDB'
 import { SelectionStateContext } from 'src/state/selectionState.context'
 import { getImageDir } from 'src/utils/utils'
@@ -98,12 +98,12 @@ export const FullImagePreview = () => {
   }, [handleOnCloseMenu])
 
   const handleOnCopySourceUrl = useCallback(() => {
-    // TODO: copy image url from imageData
-    console.log('imageData: ', imageData)
+    if (!imageData?.sourceUrl) return
+    navigator.clipboard.writeText(imageData.sourceUrl)
     handleOnCloseMenu()
   }, [handleOnCloseMenu, imageData])
 
-  const handleCloseImage = useCallback(() => {
+  const handleOnCloseContent = useCallback(() => {
     setSelectedImageId('')
     setMousePosition(null)
   }, [setSelectedImageId])
@@ -132,10 +132,28 @@ export const FullImagePreview = () => {
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
       setContentIdToEdit(selectedImageId)
-      handleCloseImage()
+      handleOnCloseContent()
     },
-    [selectedImageId, setContentIdToEdit, handleCloseImage],
+    [selectedImageId, setContentIdToEdit, handleOnCloseContent],
   )
+
+  const escapeKeyCloseHandler = useCallback(
+    (event: any) => {
+      if (event.code === 'Escape') {
+        handleOnCloseContent()
+      }
+    },
+    [handleOnCloseContent],
+  )
+
+  // TODO, make it a hook instead and return a new ref value only if the key in a
+  // list of keys we want to listen changes.!!
+  useEffect(() => {
+    document.addEventListener('keydown', escapeKeyCloseHandler)
+    return () => {
+      document?.removeEventListener('keydown', escapeKeyCloseHandler)
+    }
+  }, [escapeKeyCloseHandler])
 
   if (!selectedImageId) return
 
@@ -143,7 +161,7 @@ export const FullImagePreview = () => {
   // we can't click outside it
   return (
     <FullImagePreviewContainer>
-      <Backdrop open onClick={handleCloseImage} />
+      <Backdrop open onClick={handleOnCloseContent} />
       <Stack width="100%" height="100%" p={4} direction="row" alignItems="center" justifyContent="center">
         <Stack direction="row" height="100%" position="relative">
           <img
@@ -182,7 +200,7 @@ export const FullImagePreview = () => {
             <ListItemButton onClick={handleOnCopyImage}>
               <ListItemText primary="Copy image" />
             </ListItemButton>
-            <ListItemButton onClick={handleOnCopySourceUrl}>
+            <ListItemButton onClick={handleOnCopySourceUrl} disabled={Boolean(imageData?.sourceUrl === '')}>
               <ListItemText primary="Copy source url" />
             </ListItemButton>
           </List>

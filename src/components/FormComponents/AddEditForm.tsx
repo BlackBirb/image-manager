@@ -32,7 +32,6 @@ type FormTagsType = {
 
 const validationSchema = yup
   .object({
-    id: yup.string().required(),
     contentType: yup.string<ContentExplicityType>().required(),
     // Typescript didn't actually notice it was setting Tag[] into a string[]..
     tags: yup
@@ -74,6 +73,7 @@ type AddEditFormProps = {
   defaultValues?: AddEditFormType
 }
 
+// TODO: make it work for edit.
 export const AddEditForm = (props: AddEditFormProps) => {
   const { defaultValues } = props
   const {
@@ -86,13 +86,22 @@ export const AddEditForm = (props: AddEditFormProps) => {
 
   const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
 
-  const { control, handleSubmit, setValue, watch } = useForm<AddEditFormType>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<AddEditFormType>({
     defaultValues: defaultValues || defaultNewFormData,
     resolver: yupResolver(validationSchema),
   })
 
   const watchType = watch('type')
   const watchTags = watch('tags')
+  const watchAll = watch()
+  console.log('watchAll: ', watchAll)
+  console.log('errors: ', errors)
 
   const additionalImageUrlsFieldArray = useFieldArray({
     name: 'additionalImageUrls',
@@ -105,6 +114,7 @@ export const AddEditForm = (props: AddEditFormProps) => {
   })
 
   const onSubmit: SubmitHandler<AddEditFormType> = async (data) => {
+    console.log('onSubmit data: ', data)
     // Call the DB, save/update the data
     if (!pastedImage) {
       console.error('No image data to save!')
@@ -186,7 +196,7 @@ export const AddEditForm = (props: AddEditFormProps) => {
   }, [pastedImage])
 
   return (
-    <Stack spacing={2} height="100%" justifyContent="space-between">
+    <Stack spacing={2} height="100%" justifyContent="space-between" zIndex={11}>
       <Stack spacing={2}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Controller
@@ -219,12 +229,12 @@ export const AddEditForm = (props: AddEditFormProps) => {
             return (
               <Controller
                 key={item.id}
-                name="contentType"
+                name={`additionalImageUrls.${index}.additionalImageUrl`}
                 control={control}
                 render={({ field }) => {
                   return (
                     <Stack direction="row" alignItems="center" spacing={2}>
-                      <TextField {...field} label={`Additional url ${index}`} size="small" />
+                      <TextField {...field} label={`Additional url ${index + 1}`} size="small" />
                       <Box>
                         <IconButton onClick={() => additionalImageUrlsFieldArray.remove(index)}>
                           <CloseIcon />
