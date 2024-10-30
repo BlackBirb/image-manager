@@ -108,7 +108,7 @@ export const FormSearchTag = (props: FormSearchTagProps) => {
         withIcon
       />
 
-      <Backdrop sx={{ backgroundColor: 'transparent', zIndex: 1 }} open={open} onClick={handleCloseSearch} />
+      <Backdrop sx={{ backgroundColor: 'transparent', zIndex: 4 }} open={open} onClick={handleCloseSearch} />
       <Popper
         id={id}
         open={open}
@@ -116,7 +116,7 @@ export const FormSearchTag = (props: FormSearchTagProps) => {
         transition
         placement="bottom-start"
         sx={{
-          zIndex: 2,
+          zIndex: 5,
         }}
       >
         {({ TransitionProps }) => (

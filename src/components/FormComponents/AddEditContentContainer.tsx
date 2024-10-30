@@ -3,13 +3,14 @@ import { styled } from '@mui/material/styles'
 import { useCallback, useState } from 'react'
 import { useKeyboard } from 'src/hooks/useKeyboard'
 
-import { AddEditForm } from './AddEditForm'
+import { AddEditForm, AddEditFormType } from './AddEditForm'
 
 const Main = styled('div', {
   name: 'Main',
 })(() => ({
   position: 'absolute',
   inset: 0,
+  zIndex: 4,
 }))
 
 const ImageView = styled('img', {
@@ -34,11 +35,14 @@ const Paper = styled(MuiPaper, {
 
 type AddEditContentContainerProps = {
   imageUrl: string
-  clearImageUrl: () => void
+  onCloseForm: () => void
+  editingId?: string
+  defaultValues?: AddEditFormType
 }
 
 export const AddEditContentContainer = (props: AddEditContentContainerProps) => {
-  const { imageUrl, clearImageUrl } = props
+  const { imageUrl, onCloseForm, editingId, defaultValues } = props
+  console.log('AddEditContentContainer imageUrl: ', imageUrl)
 
   const [alert, setAlert] = useState(false)
 
@@ -55,9 +59,9 @@ export const AddEditContentContainer = (props: AddEditContentContainerProps) => 
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
       handleCloseDialog(event)
-      clearImageUrl()
+      onCloseForm()
     },
-    [handleCloseDialog, clearImageUrl],
+    [handleCloseDialog, onCloseForm],
   )
 
   useKeyboard({
@@ -67,7 +71,14 @@ export const AddEditContentContainer = (props: AddEditContentContainerProps) => 
 
   return (
     <>
-      <Backdrop id="image-preview-back-drop" open onClick={handleBackdropClose} />
+      <Backdrop
+        id="image-preview-back-drop"
+        open
+        onClick={handleBackdropClose}
+        sx={{
+          zIndex: 3,
+        }}
+      />
       <Main onClick={handleBackdropClose}>
         <Stack alignItems="center" justifyContent="center" width="100%" height="100%">
           <Paper
@@ -79,7 +90,7 @@ export const AddEditContentContainer = (props: AddEditContentContainerProps) => 
               <Stack alignItems="center" justifyContent="center" width="100%" height="100%" maxHeight="200px">
                 <ImageView src={imageUrl} />
               </Stack>
-              <AddEditForm />
+              <AddEditForm editingId={editingId} defaultValues={defaultValues} handleCloseForm={onCloseForm} />
             </Stack>
           </Paper>
         </Stack>

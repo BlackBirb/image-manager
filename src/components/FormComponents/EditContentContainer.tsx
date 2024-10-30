@@ -1,14 +1,38 @@
-import { useContext } from 'react'
-import { AddEditContentContainer } from 'src/components/AddEditContentContainer'
-import { ClipboardStateContext } from 'src/state/clipboardState.context'
+import { useContext, useMemo } from 'react'
+import { AddEditContentContainer } from 'src/components/FormComponents/AddEditContentContainer'
+import { AddEditFormType } from 'src/components/FormComponents/AddEditForm'
+import { useGetContentPath } from 'src/hooks/useGetContentPath'
+import { SelectionStateContext } from 'src/state/selectionState.context'
 
 export const EditContentContainer = () => {
   const {
-    data: { imagePreviewUrl },
-    api: { setPastedImage },
-  } = useContext(ClipboardStateContext)
+    data: { contentIdToEdit, contentDataToEdit },
+    api: { setContentIdToEdit },
+  } = useContext(SelectionStateContext)
+  const imagePath = useGetContentPath(contentDataToEdit)
 
-  if (!imagePreviewUrl) return
+  const defaultValues: AddEditFormType | null = useMemo(() => {
+    if (!contentDataToEdit) return null
+    return {
+      contentType: contentDataToEdit?.contentType,
+      tags: contentDataToEdit?.tags.map((t) => ({
+        tag: t,
+      })),
+      sourceUrl: contentDataToEdit?.sourceUrl,
+      additionalImageUrls: contentDataToEdit?.additionalUrls.map((url) => ({
+        additionalImageUrl: url,
+      })),
+      type: contentDataToEdit?.type,
+    }
+  }, [contentDataToEdit])
+  if (!contentDataToEdit || !defaultValues) return
 
-  return <AddEditContentContainer imageUrl={imagePreviewUrl} clearImageUrl={() => setPastedImage(null)} />
+  return (
+    <AddEditContentContainer
+      imageUrl={imagePath}
+      onCloseForm={() => setContentIdToEdit('')}
+      editingId={contentIdToEdit}
+      defaultValues={defaultValues}
+    />
+  )
 }

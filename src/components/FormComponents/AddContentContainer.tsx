@@ -10,5 +10,5 @@ export const AddContentContainer = () => {
 
   if (!imagePreviewUrl) return
 
-  return <AddEditContentContainer imageUrl={imagePreviewUrl} clearImageUrl={() => setPastedImage(null)} />
+  return <AddEditContentContainer imageUrl={imagePreviewUrl} onCloseForm={() => setPastedImage(null)} />
 }

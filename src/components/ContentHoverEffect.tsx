@@ -33,7 +33,7 @@ const HoverEffect = styled('div', {
   opacity: 0,
   transition: 'opacity 0.2s ease-in-out',
   backgroundColor: withoutHoverEffect ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.2)',
-  zIndex: 10,
+  zIndex: 3,
   '&:hover': {
     opacity: 1,
   },

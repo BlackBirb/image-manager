@@ -18,7 +18,6 @@ import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-fo
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
 import { saveImage } from 'src/hooks/useElectronApi'
-import { useKeyboard } from 'src/hooks/useKeyboard'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { ErrorStateContext } from 'src/state/errorState.context'
 import * as yup from 'yup'
@@ -54,7 +53,7 @@ const validationSchema = yup
   })
   .required()
 
-type AddEditFormType = {
+export type AddEditFormType = {
   contentType: ContentExplicityType
   tags: FormTagsType[]
   sourceUrl: string
@@ -71,12 +70,17 @@ const defaultNewFormData: AddEditFormType = {
 }
 
 type AddEditFormProps = {
+  editingId?: string
   defaultValues?: AddEditFormType
+  handleCloseForm?: () => void
 }
 
 // TODO: make it work for edit.
 export const AddEditForm = (props: AddEditFormProps) => {
-  const { defaultValues } = props
+  const { editingId, defaultValues, handleCloseForm } = props
+  console.log('AddEditForm editingId: ', editingId)
+
+  // Maybe move these contexts outside.
   const {
     data: { pastedImage },
     api: { setPastedImage },
@@ -85,6 +89,7 @@ export const AddEditForm = (props: AddEditFormProps) => {
     api: { throwError },
   } = useContext(ErrorStateContext)
 
+  // Maybe move this handle outside the AddEdit form.
   const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
 
   const {
@@ -114,66 +119,126 @@ export const AddEditForm = (props: AddEditFormProps) => {
     control,
   })
 
-  const onSubmit: SubmitHandler<AddEditFormType> = async (data) => {
-    console.log('onSubmit data: ', data)
-    // Call the DB, save/update the data
-    if (!pastedImage) {
-      console.error('No image data to save!')
-      return
-    }
-    if (!imageHandle) {
-      console.error('Missing image handle!')
-      return
-    }
-    const [commitImage, _] = imageHandle
-
-    const info = await commitImage()
-    console.info('[Clipboard] commit Image', info)
-    if (info === false) {
-      throwError('Failed to save image file!')
-      return
-    }
-    const dateTime = Date.now()
-
-    const tagsAsStringArray: TagName[] = data.tags
-      .map((t) => t.tag)
-      // Filter duplicate values just in case the append function missed.
-      .filter((t, index, array) => array.indexOf(t) === index)
-
-    // add non-existing tags
-    const tagsToAddToDB: TagName[] = []
-    const existingTags = await db.tags.where('name').anyOf(tagsAsStringArray).toArray()
-
-    for (const t of tagsAsStringArray) {
-      const foundTag = existingTags.find((exT) => exT.name === t)
-      if (!foundTag) {
-        tagsToAddToDB.push(t)
+  const onAddNew = useCallback(
+    async (data: AddEditFormType) => {
+      console.log('onSubmit onAddNew data: ', data)
+      // Call the DB, save/update the data
+      if (!pastedImage) {
+        console.error('No image data to save!')
+        return
       }
-    }
+      if (!imageHandle) {
+        console.error('Missing image handle!')
+        return
+      }
+      const [commitImage, _] = imageHandle
 
-    db.tags.bulkAdd(
-      tagsToAddToDB.map<Tag>((t) => {
-        return {
-          name: t,
-          createdAt: dateTime,
-          updatedAt: dateTime,
+      const info = await commitImage()
+      console.info('[Clipboard] commit Image', info)
+      if (info === false) {
+        throwError('Failed to save image file!')
+        return
+      }
+      const dateTime = Date.now()
+
+      const tagsAsStringArray: TagName[] = data.tags
+        .map((t) => t.tag)
+        // Filter duplicate values just in case the append function missed.
+        .filter((t, index, array) => array.indexOf(t) === index)
+
+      // add non-existing tags
+      const tagsToAddToDB: TagName[] = []
+      const existingTags = await db.tags.where('name').anyOf(tagsAsStringArray).toArray()
+
+      for (const t of tagsAsStringArray) {
+        const foundTag = existingTags.find((exT) => exT.name === t)
+        if (!foundTag) {
+          tagsToAddToDB.push(t)
         }
-      }),
-    )
+      }
 
-    db.content.add({
-      id: info.hash,
-      additionalUrls: data.additionalImageUrls.map((u) => u.additionalImageUrl),
-      tags: tagsAsStringArray,
-      sourceUrl: data.sourceUrl,
-      type: data.type,
-      contentType: data.contentType,
-      ext: info.ext,
-      createdAt: dateTime,
-      updatedAt: dateTime,
-    })
+      db.tags.bulkAdd(
+        tagsToAddToDB.map<Tag>((t) => {
+          return {
+            name: t,
+            createdAt: dateTime,
+            updatedAt: dateTime,
+          }
+        }),
+      )
 
-    setPastedImage(null)
+      db.content.add({
+        id: info.hash,
+        additionalUrls: data.additionalImageUrls.map((u) => u.additionalImageUrl),
+        tags: tagsAsStringArray,
+        sourceUrl: data.sourceUrl,
+        type: data.type,
+        contentType: data.contentType,
+        ext: info.ext,
+        createdAt: dateTime,
+        updatedAt: dateTime,
+      })
+      setPastedImage(null)
+    },
+    [imageHandle, pastedImage, setPastedImage, throwError],
+  )
+
+  const onEdit = useCallback(
+    async (data: AddEditFormType) => {
+      console.log('onSubmit onEdit data: ', data)
+
+      const dateTime = Date.now()
+
+      // From here -----
+      const tagsAsStringArray: TagName[] = data.tags
+        .map((t) => t.tag)
+        // Filter duplicate values just in case the append function missed.
+        .filter((t, index, array) => array.indexOf(t) === index)
+
+      // add non-existing tags
+      const tagsToAddToDB: TagName[] = []
+      const existingTags = await db.tags.where('name').anyOf(tagsAsStringArray).toArray()
+
+      for (const t of tagsAsStringArray) {
+        const foundTag = existingTags.find((exT) => exT.name === t)
+        if (!foundTag) {
+          tagsToAddToDB.push(t)
+        }
+      }
+
+      db.tags.bulkAdd(
+        tagsToAddToDB.map<Tag>((t) => {
+          return {
+            name: t,
+            createdAt: dateTime,
+            updatedAt: dateTime,
+          }
+        }),
+      )
+      // ----- is copy pasta from above. maybe make it a function
+
+      db.content.update(editingId, {
+        additionalUrls: data.additionalImageUrls.map((u) => u.additionalImageUrl),
+        tags: tagsAsStringArray,
+        sourceUrl: data.sourceUrl,
+        type: data.type,
+        contentType: data.contentType,
+        updatedAt: dateTime,
+      })
+
+      if (handleCloseForm) {
+        handleCloseForm()
+      }
+    },
+    [editingId],
+  )
+
+  const onSubmit: SubmitHandler<AddEditFormType> = async (data) => {
+    if (editingId) {
+      onEdit(data)
+    } else {
+      onAddNew(data)
+    }
   }
 
   const handleAddNewTag = useCallback(
@@ -197,7 +262,7 @@ export const AddEditForm = (props: AddEditFormProps) => {
   }, [pastedImage])
 
   return (
-    <Stack spacing={2} height="100%" justifyContent="space-between" zIndex={11}>
+    <Stack spacing={2} height="100%" justifyContent="space-between">
       <Stack spacing={2}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Controller

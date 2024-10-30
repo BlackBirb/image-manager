@@ -12,8 +12,9 @@ import {
   IconButton,
 } from '@mui/material'
 import { useLiveQuery } from 'dexie-react-hooks'
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getContentWithId } from 'src/db/useDB'
+import { useGetContentPath } from 'src/hooks/useGetContentPath'
 import { useKeyboard } from 'src/hooks/useKeyboard'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { SelectionStateContext } from 'src/state/selectionState.context'
@@ -33,7 +34,7 @@ const EditButtonWrapper = styled('div', {
   flexDirection: 'row',
   alignItems: 'start',
   justifyContent: 'flex-end',
-  zIndex: 11,
+  zIndex: 3,
   '&:hover': {
     opacity: 1,
     '&>div': {
@@ -74,7 +75,7 @@ const FullImagePreviewContainer = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  zIndex: 10,
+  zIndex: 4,
 }))
 
 export const FullImagePreview = () => {
@@ -89,16 +90,13 @@ export const FullImagePreview = () => {
   const [mousePosition, setMousePosition] = useState<MousePositionType | null>(null)
 
   const imageData = useLiveQuery(() => getContentWithId(selectedImageId), [selectedImageId])
-
-  const imagePath = useMemo(() => {
-    if (!imageData?.id) return ''
-    return getImageDir(imageData.id, imageData.ext, false)
-  }, [imageData])
+  const imagePath = useGetContentPath(imageData)
 
   const handleOnCloseMenu = useCallback(() => [setMousePosition(null)], [])
 
   const handleOnCopyImage = useCallback(() => {
     // TODO: copy image
+    // navigator.clipboard.write()
     handleOnCloseMenu()
   }, [handleOnCloseMenu])
 
@@ -174,7 +172,7 @@ export const FullImagePreview = () => {
             }}
           />
           <EditButtonWrapper>
-            <Box p={0.5} zIndex={11}>
+            <Box p={0.5} zIndex={2}>
               <IconButton onClick={handleOnContentEdit}>
                 <SettingsIcon />
               </IconButton>

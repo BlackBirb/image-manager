@@ -1,6 +1,7 @@
 import { Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { AddContentContainer } from 'src/components/FormComponents/AddContentContainer'
+import { EditContentContainer } from 'src/components/FormComponents/EditContentContainer'
 import { FullImagePreview } from 'src/components/FullImagePreivew'
 import { ImageGallery } from 'src/components/ImageGallery'
 import { Search } from 'src/components/SearchComponents/Search'
@@ -53,6 +54,7 @@ export const Root = () => {
       </Main>
       <FullImagePreview />
       <AddContentContainer />
+      <EditContentContainer />
       <ClipboardListener />
     </GridLayout>
   )
