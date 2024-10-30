@@ -1,6 +1,7 @@
 import { Backdrop, Button, Dialog, DialogActions, DialogTitle, Paper as MuiPaper, Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useCallback, useState } from 'react'
+import { useKeyboard } from 'src/hooks/useKeyboard'
 
 import { AddEditForm } from './AddEditForm'
 
@@ -58,6 +59,11 @@ export const AddEditContentContainer = (props: AddEditContentContainerProps) => 
     },
     [handleCloseDialog, clearImageUrl],
   )
+
+  useKeyboard({
+    key: 'Escape',
+    onKeyPressed: handleBackdropClose,
+  })
 
   return (
     <>

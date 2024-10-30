@@ -18,6 +18,7 @@ import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-fo
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
 import { saveImage } from 'src/hooks/useElectronApi'
+import { useKeyboard } from 'src/hooks/useKeyboard'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { ErrorStateContext } from 'src/state/errorState.context'
 import * as yup from 'yup'

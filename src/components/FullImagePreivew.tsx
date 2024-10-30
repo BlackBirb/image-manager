@@ -14,6 +14,8 @@ import {
 import { useLiveQuery } from 'dexie-react-hooks'
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { getContentWithId } from 'src/db/useDB'
+import { useKeyboard } from 'src/hooks/useKeyboard'
+import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { SelectionStateContext } from 'src/state/selectionState.context'
 import { getImageDir } from 'src/utils/utils'
 
@@ -80,6 +82,9 @@ export const FullImagePreview = () => {
     data: { selectedImageId },
     api: { setSelectedImageId, setContentIdToEdit },
   } = useContext(SelectionStateContext)
+  const {
+    data: { imagePreviewUrl },
+  } = useContext(ClipboardStateContext)
 
   const [mousePosition, setMousePosition] = useState<MousePositionType | null>(null)
 
@@ -137,23 +142,16 @@ export const FullImagePreview = () => {
     [selectedImageId, setContentIdToEdit, handleOnCloseContent],
   )
 
-  const escapeKeyCloseHandler = useCallback(
-    (event: any) => {
-      if (event.code === 'Escape') {
-        handleOnCloseContent()
-      }
-    },
-    [handleOnCloseContent],
-  )
+  useKeyboard({
+    key: 'Escape',
+    onKeyPressed: handleOnCloseContent,
+  })
 
-  // TODO, make it a hook instead and return a new ref value only if the key in a
-  // list of keys we want to listen changes.!!
   useEffect(() => {
-    document.addEventListener('keydown', escapeKeyCloseHandler)
-    return () => {
-      document?.removeEventListener('keydown', escapeKeyCloseHandler)
+    if (imagePreviewUrl) {
+      handleOnCloseContent()
     }
-  }, [escapeKeyCloseHandler])
+  }, [imagePreviewUrl, handleOnCloseContent])
 
   if (!selectedImageId) return
 
