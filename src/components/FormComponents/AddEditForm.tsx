@@ -13,11 +13,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect } from 'react'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { FormSearchTag } from 'src/components/FormComponents/FormSearchTag'
 import { ContentExplicityType, ContentType, db, Tag, TagName } from 'src/db/db'
-import { saveImage } from 'src/hooks/useElectronApi'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { ErrorStateContext } from 'src/state/errorState.context'
 import * as yup from 'yup'
@@ -81,15 +80,14 @@ export const AddEditForm = (props: AddEditFormProps) => {
 
   // Maybe move these contexts outside.
   const {
-    data: { pastedImage },
+    data: { pastedImage, imageHandle },
     api: { setPastedImage },
   } = useContext(ClipboardStateContext)
   const {
     api: { throwError },
   } = useContext(ErrorStateContext)
-
+  const [commitImage, discardImage] = imageHandle
   // Maybe move this handle outside the AddEdit form.
-  const [imageHandle, setImageHandle] = useState<ReturnType<typeof saveImage> | null>(null)
 
   const {
     control,
@@ -127,11 +125,11 @@ export const AddEditForm = (props: AddEditFormProps) => {
         console.error('No image data to save!')
         return
       }
-      if (!imageHandle) {
+
+      if (!commitImage) {
         console.error('Missing image handle!')
         return
       }
-      const [commitImage, _] = imageHandle
 
       const info = await commitImage()
       console.info('[Clipboard] commit Image', info)
@@ -180,7 +178,7 @@ export const AddEditForm = (props: AddEditFormProps) => {
       })
       setPastedImage(null)
     },
-    [imageHandle, pastedImage, setPastedImage, throwError],
+    [commitImage, pastedImage, setPastedImage, throwError],
   )
 
   const onEdit = useCallback(
@@ -253,13 +251,15 @@ export const AddEditForm = (props: AddEditFormProps) => {
   )
 
   useEffect(() => {
-    if (pastedImage !== null) {
-      console.info('Prefetching image: ', pastedImage)
-      setImageHandle(saveImage(pastedImage))
-    }
-
     if (pastedImage instanceof URL) setValue('sourceUrl', pastedImage.href)
   }, [pastedImage])
+
+  useEffect(() => {
+    return () => {
+      // Discard image when we leave the form.
+      discardImage()
+    }
+  }, [discardImage])
 
   return (
     <Stack spacing={2} height="100%" justifyContent="space-between">

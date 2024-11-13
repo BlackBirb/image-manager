@@ -6,10 +6,6 @@ remove tags?
   if it exists, go to edit preview instead of add new image..
   Make a wrapper that will do that because of how hook forms default values work.
 
-6. Dashboard Grid images, right click with options to:
-  copy image (sharing)
-  copy image path (PC path) if you want to copy it yourself.
-
 7. Gifs ?
 8. Videos ?
 

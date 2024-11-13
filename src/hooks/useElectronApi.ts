@@ -14,7 +14,9 @@ export const useWindowMaximize = (): [boolean | null, () => Promise<void>] => {
   return [isMaximized, toggleMaximize]
 }
 
-export const saveImage = (img: URL | File): [() => Promise<SavedImageInfo | false>, () => Promise<boolean>] => {
+export type SaveImageHandleType = [() => Promise<SavedImageInfo | false>, () => Promise<boolean>]
+
+export const saveImage = (img: URL | File): SaveImageHandleType => {
   let handlePromise: Promise<IElectronAPI.TmpImgHandle | null> | null = null
   if (img instanceof URL) {
     handlePromise = window.api.prefetchImage(img.href)
