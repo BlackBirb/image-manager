@@ -37,7 +37,7 @@ export const ImageGallery = () => {
           {content?.map((item) => {
             return (
               <Grid2 key={item.id}>
-                <ImageGridItem id={item.id} ext={item.ext} thumbnail />
+                <ImageGridItem id={item.id} />
               </Grid2>
             )
           })}

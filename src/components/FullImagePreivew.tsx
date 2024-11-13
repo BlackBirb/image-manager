@@ -1,24 +1,12 @@
 import { Settings as SettingsIcon } from '@mui/icons-material'
-import {
-  Backdrop,
-  Collapse,
-  List,
-  ListItemButton,
-  ListItemText,
-  Paper,
-  Stack,
-  styled,
-  Box,
-  IconButton,
-} from '@mui/material'
-import { useLiveQuery } from 'dexie-react-hooks'
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { getContentWithId } from 'src/db/useDB'
-import { useGetContentPath } from 'src/hooks/useGetContentPath'
+import { Backdrop, Stack, styled, Box, IconButton } from '@mui/material'
+import React, { useCallback, useContext, useEffect } from 'react'
+import { RightClickMenu } from 'src/components/RightClickMenu'
+import { useImageData } from 'src/hooks/useImageData'
 import { useKeyboard } from 'src/hooks/useKeyboard'
+import { useMousePositionClick } from 'src/hooks/useMousePositionClick'
 import { ClipboardStateContext } from 'src/state/clipboardState.context'
 import { SelectionStateContext } from 'src/state/selectionState.context'
-import { getImageDir } from 'src/utils/utils'
 
 const EditButtonWrapper = styled('div', {
   name: 'EditButtonWrapper',
@@ -62,11 +50,6 @@ const EditButtonHoverEffect = styled('div', {
   clipPath: 'border-box',
 }))
 
-type MousePositionType = {
-  x: number
-  y: number
-}
-
 const FullImagePreviewContainer = styled('div', {
   name: 'FullImagePreview',
 })(() => ({
@@ -87,49 +70,13 @@ export const FullImagePreview = () => {
     data: { imagePreviewUrl },
   } = useContext(ClipboardStateContext)
 
-  const [mousePosition, setMousePosition] = useState<MousePositionType | null>(null)
-
-  const imageData = useLiveQuery(() => getContentWithId(selectedImageId), [selectedImageId])
-  const imagePath = useGetContentPath(imageData)
-
-  const handleOnCloseMenu = useCallback(() => [setMousePosition(null)], [])
-
-  const handleOnCopyImage = useCallback(() => {
-    // TODO: copy image
-    // navigator.clipboard.write()
-    handleOnCloseMenu()
-  }, [handleOnCloseMenu])
-
-  const handleOnCopySourceUrl = useCallback(() => {
-    if (!imageData?.sourceUrl) return
-    navigator.clipboard.writeText(imageData.sourceUrl)
-    handleOnCloseMenu()
-  }, [handleOnCloseMenu, imageData])
+  const [sourceUrl, imagePath] = useImageData(selectedImageId)
+  const { mousePosition, handleRightClick, handleOnCloseMenu } = useMousePositionClick()
 
   const handleOnCloseContent = useCallback(() => {
     setSelectedImageId('')
-    setMousePosition(null)
-  }, [setSelectedImageId])
-
-  const handleLeftClick = useCallback(() => {
     handleOnCloseMenu()
-  }, [handleOnCloseMenu])
-
-  const handleRightClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault()
-      if (event.nativeEvent.button === 0) {
-        handleOnCloseMenu()
-      }
-      if (event.nativeEvent.button === 2) {
-        setMousePosition({
-          x: event.clientX + 2,
-          y: event.clientY - 6,
-        })
-      }
-    },
-    [handleOnCloseMenu],
-  )
+  }, [setSelectedImageId, handleOnCloseMenu])
 
   const handleOnContentEdit = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -162,7 +109,7 @@ export const FullImagePreview = () => {
         <Stack direction="row" height="100%" position="relative">
           <img
             src={imagePath}
-            onClick={handleLeftClick}
+            onClick={handleOnCloseMenu}
             onContextMenu={handleRightClick}
             style={{
               zIndex: 1,
@@ -182,26 +129,12 @@ export const FullImagePreview = () => {
         </Stack>
       </Stack>
 
-      <Paper
-        style={{
-          display: mousePosition ? 'block' : 'none',
-          position: 'absolute',
-          top: mousePosition ? mousePosition?.y + 6 : 0,
-          left: mousePosition?.x,
-          zIndex: 1,
-        }}
-      >
-        <Collapse in={Boolean(mousePosition)}>
-          <List>
-            <ListItemButton onClick={handleOnCopyImage}>
-              <ListItemText primary="Copy image" />
-            </ListItemButton>
-            <ListItemButton onClick={handleOnCopySourceUrl} disabled={Boolean(imageData?.sourceUrl === '')}>
-              <ListItemText primary="Copy source url" />
-            </ListItemButton>
-          </List>
-        </Collapse>
-      </Paper>
+      <RightClickMenu
+        mousePosition={mousePosition}
+        sourceUrl={sourceUrl}
+        onCloseMenu={handleOnCloseMenu}
+        disabled={Boolean(sourceUrl === '')}
+      />
     </FullImagePreviewContainer>
   )
 }

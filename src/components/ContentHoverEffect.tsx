@@ -42,12 +42,13 @@ const HoverEffect = styled('div', {
 type ContentHoverEffectProps = {
   withoutHoverEffect?: boolean
   onEditContent: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onRightClick: (event: React.MouseEvent<HTMLDivElement>) => void
 }
 
 export const ContentHoverEffect = (props: ContentHoverEffectProps) => {
-  const { withoutHoverEffect, onEditContent } = props
+  const { withoutHoverEffect, onEditContent, onRightClick } = props
   return (
-    <HoverEffect withoutHoverEffect={withoutHoverEffect}>
+    <HoverEffect withoutHoverEffect={withoutHoverEffect} onContextMenu={onRightClick}>
       <EditButtonWrapper>
         <Box p={0.5}>
           <IconButton onClick={onEditContent}>

@@ -1,8 +1,10 @@
 import { styled } from '@mui/material'
-import { useCallback, useContext, useMemo } from 'react'
+import { useCallback, useContext } from 'react'
 import { ContentHoverEffect } from 'src/components/ContentHoverEffect'
+import { RightClickMenu } from 'src/components/RightClickMenu'
+import { useImageData } from 'src/hooks/useImageData'
+import { useMousePositionClick } from 'src/hooks/useMousePositionClick'
 import { SelectionStateContext } from 'src/state/selectionState.context'
-import { getImageDir } from 'src/utils/utils'
 
 const ImageContainer = styled('div', {
   name: 'ImageContainer',
@@ -21,12 +23,10 @@ const ImageContainer = styled('div', {
 
 type ImageGridItemProps = {
   id: string
-  ext: string
-  thumbnail?: boolean
 }
 
 export const ImageGridItem = (props: ImageGridItemProps) => {
-  const { id, ext, thumbnail } = props
+  const { id } = props
 
   const {
     api: { setContentIdToEdit },
@@ -36,9 +36,8 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
     api: { setSelectedImageId },
   } = useContext(SelectionStateContext)
 
-  const imagePath = useMemo(() => {
-    return getImageDir(id, ext, !!thumbnail)
-  }, [id, ext, thumbnail])
+  const [sourceUrl, imagePath] = useImageData(id, true)
+  const { mousePosition, handleRightClick, handleOnCloseMenu } = useMousePositionClick()
 
   const handleOnContentEdit = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,14 +52,19 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
   }, [id, setSelectedImageId])
 
   return (
-    <ImageContainer onClick={handleOnContentClick}>
+    <ImageContainer onClick={handleOnContentClick} onMouseLeave={handleOnCloseMenu}>
       <div
         style={{
           backgroundImage: `url(${imagePath})`,
         }}
       />
-
-      <ContentHoverEffect onEditContent={handleOnContentEdit} />
+      <ContentHoverEffect onEditContent={handleOnContentEdit} onRightClick={handleRightClick} />
+      <RightClickMenu
+        mousePosition={mousePosition}
+        sourceUrl={sourceUrl}
+        onCloseMenu={handleOnCloseMenu}
+        disabled={Boolean(sourceUrl === '')}
+      />
     </ImageContainer>
   )
 }
