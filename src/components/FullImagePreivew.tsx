@@ -132,6 +132,7 @@ export const FullImagePreview = () => {
       <RightClickMenu
         mousePosition={mousePosition}
         sourceUrl={sourceUrl}
+        imageId={selectedImageId}
         onCloseMenu={handleOnCloseMenu}
         disabled={Boolean(sourceUrl === '')}
       />

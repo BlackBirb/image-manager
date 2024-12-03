@@ -14,6 +14,9 @@ export const commitImage = (handle: TmpImgHandle): Promise<SavedImageInfo | fals
   ipcRenderer.invoke('commitImage', handle)
 export const discardImage = (handle: TmpImgHandle): Promise<boolean> => ipcRenderer.invoke('discardImage', handle)
 
+export const copyImageClipboard = (imageHash: string, ext: string) =>
+  ipcRenderer.send('copyImageClipboard', imageHash, ext)
+
 export const onWindowMaximize = (cb: (maximized: boolean) => void) => {
   const onMaximize = () => cb(true)
   const onUnMaximize = () => cb(false)

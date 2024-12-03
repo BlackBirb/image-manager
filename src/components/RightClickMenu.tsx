@@ -1,5 +1,7 @@
 import { Collapse, List, ListItemButton, ListItemText, Paper } from '@mui/material'
 import { useCallback } from 'react'
+import { getContentWithId } from 'src/db/useDB'
+import { useElectronApi } from 'src/hooks/useElectronApi'
 
 export type MousePositionType = {
   x: number
@@ -8,21 +10,28 @@ export type MousePositionType = {
 
 type RightClickMenuProps = {
   mousePosition: MousePositionType | null
+  imageId: string
   sourceUrl?: string
   onCloseMenu: () => void
   disabled?: boolean
 }
 
 export const RightClickMenu = (props: RightClickMenuProps) => {
-  const { mousePosition, sourceUrl, onCloseMenu, disabled } = props
+  const { mousePosition, sourceUrl, imageId, onCloseMenu, disabled } = props
+
+  const electronApi = useElectronApi()
 
   const handleOnCopyImage = useCallback(
-    (event: React.MouseEvent<HTMLDivElement> | undefined) => {
+    async (event: React.MouseEvent<HTMLDivElement> | undefined) => {
       if (event) {
         event.stopPropagation()
       }
-      // TODO: copy image
-      // navigator.clipboard.write()
+
+      const imageContent = await getContentWithId(imageId)
+      if (!imageContent) throw 'TODO: How did errors work? Image not found from id'
+
+      electronApi.copyImageClipboard(imageContent.id, imageContent.ext)
+
       onCloseMenu()
     },
     [onCloseMenu],

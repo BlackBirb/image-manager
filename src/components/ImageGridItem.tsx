@@ -62,6 +62,7 @@ export const ImageGridItem = (props: ImageGridItemProps) => {
       <RightClickMenu
         mousePosition={mousePosition}
         sourceUrl={sourceUrl}
+        imageId={id}
         onCloseMenu={handleOnCloseMenu}
         disabled={Boolean(sourceUrl === '')}
       />

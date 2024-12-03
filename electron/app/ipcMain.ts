@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain, nativeImage, clipboard } from 'electron'
 
 import {
   cacheImage,
@@ -9,6 +9,7 @@ import {
   savePrefetchedImage,
   setOutputPath,
   TmpImgHandle,
+  resolveImageFile,
 } from './imageService'
 
 export const createIPCApi = (windows: WindowsManager): void => {
@@ -84,6 +85,15 @@ export const createIPCApi = (windows: WindowsManager): void => {
       evn.sender.send('error', err)
       return false
     }
+  })
+
+  ipcMain.on('copyImageClipboard', (_evn, imageHash, ext) => {
+    const imgPath = resolveImageFile(imageHash, ext, false)
+    // TODO: This will blow up on non-images (gifs/videos)
+    const image = nativeImage.createFromPath(imgPath)
+    clipboard.write({
+      image,
+    })
   })
 
   ipcMain.handle('openPathChooser', async (_evn): Promise<Electron.OpenDialogReturnValue> => {
